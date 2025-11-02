@@ -1,0 +1,12 @@
+[routers]
+vIOS-R1 ansible_host=192.168.1.101 loopback_ip=1.1.1.1
+vIOS-R2 ansible_host=192.168.1.102 loopback_ip=2.2.2.2
+vIOS-R3 ansible_host=192.168.1.103 loopback_ip=3.3.3.3
+
+[routers:vars]
+ansible_network_os=ios
+ansible_connection=network_cli
+ansible_user=ansible
+ansible_password=ansible@123
+ansible_become=yes
+ansible_become_method=enable

@@ -1,0 +1,2 @@
+cryptography>=42.0.5
+paramiko>=3.4.0

@@ -1,0 +1,16 @@
+---
+- name: Configure Loopback0 Interface on All Routers
+  hosts: routers
+  gather_facts: no
+  
+  tasks:
+    - name: Configure Loopback0 interface
+      cisco.ios.ios_config:
+        lines:
+          - description Managed by Ansible
+          - "ip address {{ loopback_ip }} 255.255.255.255"
+        parents: interface Loopback0
+      
+    - name: Save configuration
+      cisco.ios.ios_config:
+        save_when: always

@@ -1,0 +1,3 @@
+from conjurTenant.connector import TenantConnector
+
+TenantConnectorType = TenantConnector

@@ -1,0 +1,24 @@
+---
+- name: Get FortiGate System Status
+  hosts: fortigates                    # Target the fortigates group
+  connection: httpapi                  # Use API connection
+  gather_facts: no                     # Don't gather system facts
+  collections:
+    - fortinet.fortios                 # Use FortiGate collection
+  vars_files:
+    - ../host_vars/Forti-FW-1.yml     # CRITICAL: Explicitly load vault file
+  
+  tasks:
+    - name: Retrieve system status
+      fortios_monitor_fact:
+        access_token: "{{ fortios_api_token }}"  # Use encrypted token
+        selector: 'system_status'
+      register: result                  # Save output
+    
+    - name: Display system information
+      debug:
+        msg: 
+          - "Hostname: {{ result.meta.results.hostname }}"
+          - "Version: {{ result.meta.version }}"
+          - "Serial: {{ result.meta.serial }}"
+          - "Model: {{ result.meta.results.model_name }} {{ result.meta.results.model_number }}"

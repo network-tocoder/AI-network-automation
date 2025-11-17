@@ -1,1 +1,4 @@
 /ansible_venv/
+*.log
+*.retry
+/host_vars/fortigates.yml

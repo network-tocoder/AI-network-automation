@@ -1,0 +1,18 @@
+---
+- name: Test host_vars loading
+  hosts: fortigates
+  connection: local
+  gather_facts: no
+  
+  tasks:
+    - name: Show all variables for this host
+      debug:
+        var: hostvars[inventory_hostname]
+    
+    - name: Check if token is defined
+      debug:
+        msg: "Token defined: {{ fortios_api_token is defined }}"
+    
+    - name: Try to show token
+      debug:
+        msg: "Token: {{ fortios_api_token | default('NOT FOUND') }}"

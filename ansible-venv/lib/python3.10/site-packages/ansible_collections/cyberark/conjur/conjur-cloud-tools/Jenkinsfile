@@ -1,0 +1,298 @@
+#!/usr/bin/env groovy
+@Library("product-pipelines-shared-library") _
+@Library("conjur-enterprise-sharedlib") __
+
+pipeline {
+  agent { label 'conjur-enterprise-common-agent' }
+
+  options {
+    timestamps()
+    buildDiscarder(logRotator(numToKeepStr: '30'))
+  }
+  triggers {
+    parameterizedCron(getDailyCronString("%CLEANUP=true"))
+  }
+
+  parameters {
+    booleanParam(
+      name: 'PAM_SELF_HOSTED',
+      description: "Select to deploy a conjur cloud tenant with PAM Self-Hosted support",
+      defaultValue: false
+    )
+    booleanParam(
+      name: 'CLEANUP',
+      description: "Cleanup expired tenants",
+      defaultValue: false
+    )
+    string(
+      name: 'DELETE',
+      description: "Delete a tenant by ID",
+      defaultValue: '',
+      trim: true
+    )
+  }
+
+  stages {
+    stage('Get InfraPool ExecutorV2 Agent') {
+      steps {
+        script {
+          INFRAPOOL_EXECUTORV2_AGENT_0 = getInfraPoolAgent.connected(type: "ExecutorV2", quantity: 1, duration: 1)[0]
+        }
+      }
+    }
+
+    stage('Build Conjur Cloud Tenant Image') {
+      steps {
+        script {
+          dir("${WORKSPACE}/conjurCloudTenant/conjur_cloud_tenant") {
+            // Copy the Artifactory certificate to the InfraPool agent
+            INFRAPOOL_EXECUTORV2_AGENT_0.agentPut from: "/usr/local/share/ca-certificates/combined.crt", to: "combined.crt"
+            withArtifactoryReaderCredentials("cloud"){
+              // Copy the Artifactory credentials to the InfraPool agent
+              INFRAPOOL_EXECUTORV2_AGENT_0.agentPut from: "$HOME/.netrc", to: ".netrc"
+              INFRAPOOL_EXECUTORV2_AGENT_0.agentSh """
+              docker build \
+                -f Dockerfile \
+                -t infra-everest \
+                .
+              """
+            }
+          }
+        }
+      }
+    }
+
+    stage('Run Conjur Cloud Tenant Tests') {
+      steps {
+        script {
+          dir("${WORKSPACE}/conjurCloudTenant/conjur_cloud_tenant") {
+            INFRAPOOL_EXECUTORV2_AGENT_0.agentSh """
+              summon -f secrets.yml -e ci \
+                docker run \
+                  -v ".:/everest" \
+                  -e AWS_DEFAULT_REGION \
+                  -e CONJUR_CLOUD_ADMIN_PASS \
+                  --rm \
+                  --name test_infra-everest \
+                  --entrypoint /bin/run_conjur_cloud_tenant_tests.sh \
+                  infra-everest:latest
+            """
+          }
+        }
+      }
+    }
+
+    stage('Build Tenant Authentication Image') {
+      steps {
+        script {
+          dir("${WORKSPACE}/conjurCloudTenant/tenant_authentication") {
+            INFRAPOOL_EXECUTORV2_AGENT_0.agentSh(
+              script: """
+                docker build \
+                  -f Dockerfile \
+                  -t auth-tenant \
+                  .
+              """,
+              returnStdout: false)
+          }
+        }
+      }
+    }
+
+    stage('Run Tenant Authentication Tests') {
+      steps {
+        script {
+          dir("${WORKSPACE}/conjurCloudTenant/tenant_authentication") {
+            INFRAPOOL_EXECUTORV2_AGENT_0.agentSh """
+              docker run \
+                --rm \
+                --entrypoint ./bin/run-tenant-auth-tests.sh \
+                auth-tenant
+            """
+          }
+        }
+      }
+    }
+
+    stage('Create Conjur Cloud Tenant') {
+      when {
+        expression {
+          shouldCreateTenant()
+        }
+      }
+      steps {
+        script {
+          dir("${WORKSPACE}/conjurCloudTenant/conjur_cloud_tenant") {
+            def pamshArg = ""
+            if (params.PAM_SELF_HOSTED) {
+              pamshArg = "--pamsh"
+            }
+            INFRAPOOL_EXECUTORV2_AGENT_0.agentSh(
+              script: """
+                summon -f secrets.yml -e ci \
+                  docker run \
+                    -v ".:/everest" \
+                    -e AWS_DEFAULT_REGION \
+                    -e CONJUR_CLOUD_ADMIN_PASS \
+                    --rm \
+                    --name infra-everest \
+                    infra-everest:latest ${pamshArg}
+              """,
+              returnStdout: false)
+
+            // Copy the tenant.json file from the InfraPool agent to the Atlantis agent
+            INFRAPOOL_EXECUTORV2_AGENT_0.agentGet(from: "tenant.json", to: ".")
+            // Set the tenant info from the tenant.json file
+            getConjurCloudTenant.setTenantInfoFromFile("tenant.json")
+
+            INFRAPOOL_EXECUTORV2_AGENT_0.agentArchiveArtifacts(
+                artifacts: "tenant.json",
+                fingerprint: false,
+                allowEmptyArchive: false
+            )
+          }
+        }
+      }
+    }
+
+    stage('Delete Tenant') {
+      when {
+        expression {
+          params.DELETE != ''
+        }
+      }
+      steps {
+        script {
+          dir("${WORKSPACE}/conjurCloudTenant/conjur_cloud_tenant") {
+            INFRAPOOL_EXECUTORV2_AGENT_0.agentSh(
+              script: """
+                summon -f secrets.yml -e ci \
+                  docker run \
+                    -v ".:/everest" \
+                    -e AWS_DEFAULT_REGION \
+                    --rm \
+                    --name infra-everest \
+                    infra-everest:latest --delete ${params.DELETE}
+              """,)
+          }
+        }
+      }
+    }
+
+    stage('Cleanup Expired Tenants') {
+      when {
+        expression {
+          params.CLEANUP
+        }
+      }
+      steps {
+        script {
+          dir("${WORKSPACE}/conjurCloudTenant/conjur_cloud_tenant") {
+            def cleanup_status = INFRAPOOL_EXECUTORV2_AGENT_0.agentSh(
+              script: """
+                summon -f secrets.yml -e ci \
+                  docker run \
+                    -v ".:/everest" \
+                    -e AWS_DEFAULT_REGION \
+                    --rm \
+                    --name infra-everest \
+                    infra-everest:latest --cleanup
+              """,)
+          }
+        }
+      }
+    }
+
+    stage('Authenticate Identity Cloud Tenant') {
+      when {
+        expression {
+          shouldCreateTenant()
+        }
+      }
+      steps {
+        script {
+          // Read the tenant information from the tenant.json file
+          TENANT = readJSON text: TENANT_INFO
+          dir("${WORKSPACE}/conjurCloudTenant/bin") {
+            IDENTITY_TOKEN = INFRAPOOL_EXECUTORV2_AGENT_0.agentSh(
+              script: """
+                ./run-tenant-auth.sh \
+                  --identity-url ${TENANT.identity_information.idaptive_tenant_fqdn} \
+                  --username ${TENANT.login_name} \
+              """,
+              returnStdout: true)
+          }
+        }
+      }
+      post {
+        failure {
+          script {
+            echo "Failed to authenticate username/password. Deleting tenant."
+            deleteFailedTenant()
+          }
+        }
+      }
+    }
+
+    stage('Authenticate Conjur Cloud Tenant') {
+      when {
+        expression {
+          shouldCreateTenant()
+        }
+      }
+      steps {
+        script {
+          dir("${WORKSPACE}/conjurCloudTenant/bin") {
+            retry(count:3) {
+              sleep(time: 10, unit: 'SECONDS')
+              INFRAPOOL_EXECUTORV2_AGENT_0.agentSh(
+                script: """
+                  ./run-tenant-auth.sh \
+                    --conjur-url ${TENANT.conjur_cloud_url} \
+                    --identity-token ${IDENTITY_TOKEN}
+                """,
+                returnStdout: false)
+            }
+          }
+        }
+      }
+      post {
+        failure {
+          script {
+            echo "Failed to authenticate with Identity token. Deleting tenant."
+            deleteFailedTenant()
+          }
+        }
+      }
+    }
+  }
+  post {
+    always {
+      script {
+        releaseInfraPoolAgent(".infrapool/release_agents")
+      }
+    }
+  }
+}
+
+def shouldCreateTenant() {
+  if (params.CLEANUP || params.DELETE != '') {
+    return false
+  }
+  return true
+}
+
+def deleteFailedTenant() {
+  dir("${WORKSPACE}/conjurCloudTenant/conjur_cloud_tenant") {
+    INFRAPOOL_EXECUTORV2_AGENT_0.agentSh(
+      script: """
+        summon -f secrets.yml -e ci \
+          docker run \
+            -v ".:/everest" \
+            -e AWS_DEFAULT_REGION \
+            --rm \
+            --name infra-everest \
+            infra-everest:latest --delete ${TENANT.id}
+      """,)
+  }
+}

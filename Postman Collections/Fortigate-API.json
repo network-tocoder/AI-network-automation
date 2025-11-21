@@ -1,0 +1,139 @@
+{
+	"info": {
+		"_postman_id": "67a161ff-a8d1-47a4-ab32-e62efcd9160a",
+		"name": "Fortigate API Lab",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "System Mointoring",
+			"item": [
+				{
+					"name": "Get System Information",
+					"id": "5c227175-7019-4296-ba26-5495262f59df",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{api_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/api/v2/monitor/system/status"
+					},
+					"response": []
+				}
+			],
+			"id": "5282970a-e00d-4f7c-b106-646b5d3fbeac"
+		},
+		{
+			"name": "Firewall Configration",
+			"item": [
+				{
+					"name": "Create New FW Object",
+					"id": "aae28478-bab8-4292-9730-a8e8f18eabd8",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{api_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"API_Demo_Server\",\r\n  \"subnet\": \"10.0.5.100 255.255.255.255\",\r\n  \"type\": \"ipmask\",\r\n  \"comment\": \"Created via VS Code Postman Extension - NetworkCoder\"\r\n}Up",
+							"options": {
+								"raw": {
+									"language": "text"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v2/cmdb/firewall/address?vdom={{vdom}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"cmdb",
+								"firewall",
+								"address"
+							],
+							"query": [
+								{
+									"key": "vdom",
+									"value": "{{vdom}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "07f4a155-9190-4d1f-9de2-4b2cec944af4"
+		},
+		{
+			"name": "Network Configration",
+			"item": [
+				{
+					"name": "Update Interface Config",
+					"id": "7c0ea03b-f644-4046-9e2d-85a763088238",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{api_token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"alias\": \"LAN-Internal\",\r\n  \"description\": \"Internal network - Updated via Postman API\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "text"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v2/cmdb/system/interface/port2?vdom={{vdom}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"cmdb",
+								"system",
+								"interface",
+								"port2"
+							],
+							"query": [
+								{
+									"key": "vdom",
+									"value": "{{vdom}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "0c66f115-3885-417a-a071-2e93a52b3fa7"
+		}
+	]
+}

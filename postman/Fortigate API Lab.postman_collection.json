@@ -1,0 +1,34 @@
+{
+	"info": {
+		"_postman_id": "67a161ff-a8d1-47a4-ab32-e62efcd9160a",
+		"name": "Fortigate API Lab",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12272207"
+	},
+	"item": [
+		{
+			"name": "System Mointoring",
+			"item": [
+				{
+					"name": "Get System Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Firewall Configration",
+			"item": []
+		},
+		{
+			"name": "Network Configration",
+			"item": []
+		}
+	]
+}

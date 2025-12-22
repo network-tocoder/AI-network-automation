@@ -70,17 +70,7 @@ Install EVE-NG on VMware Workstation and build your first virtual network topolo
 ### 💻 Commands
 
 <details>
-<summary>1. Download EVE-NG</summary>
-
-```bash
-# Download EVE-NG Community ISO/OVA from:
-# https://www.eve-ng.net/index.php/download/
-```
-
-</details>
-
-<details>
-<summary>2. Initial Setup After Boot</summary>
+<summary>1. Initial Setup After Boot</summary>
 
 ```bash
 # Default credentials
@@ -97,7 +87,7 @@ Password: eve
 </details>
 
 <details>
-<summary>3. Update EVE-NG</summary>
+<summary>2. Update EVE-NG</summary>
 
 ```bash
 # Update system packages
@@ -110,13 +100,11 @@ apt --fix-broken install
 </details>
 
 <details>
-<summary>4. Access Web Interface</summary>
+<summary>3. Access Web Interface</summary>
 
 ```bash
 # Find your EVE-NG IP address
 ip addr show
-
-# Or
 hostname -I
 
 # Access in browser: http://YOUR-EVE-NG-IP
@@ -128,7 +116,7 @@ hostname -I
 </details>
 
 <details>
-<summary>5. Upload Device Images</summary>
+<summary>4. Upload Device Images</summary>
 
 ```bash
 # Connect via SFTP/SCP
@@ -147,7 +135,7 @@ hostname -I
 </details>
 
 <details>
-<summary>6. Useful EVE-NG Commands</summary>
+<summary>5. Useful EVE-NG Commands</summary>
 
 ```bash
 # Check EVE-NG service status
@@ -189,14 +177,52 @@ Deploy a Linux node inside EVE-NG, install Ansible, and integrate VS Code for a 
 ### 💻 Commands
 
 <details>
-<summary>1. Install Ansible</summary>
+<summary>1. Update Ubuntu & Install Prerequisites</summary>
 
 ```bash
 # Update system
 sudo apt update && sudo apt upgrade -y
 
+# Check Python version
+python3 --version
+
+# Install OpenSSH Server
+sudo apt install openssh-server -y
+sudo systemctl enable ssh
+sudo systemctl start ssh
+
+# Install Python venv
+sudo apt install python3-venv -y
+```
+
+</details>
+
+<details>
+<summary>2. Create Project & Virtual Environment</summary>
+
+```bash
+# Create Ansible project directory
+mkdir ~/ansible-project
+cd ~/ansible-project
+
+# Create virtual environment
+python3 -m venv ansible-venv
+
+# Activate virtual environment
+source ansible-venv/bin/activate
+```
+
+</details>
+
+<details>
+<summary>3. Install Ansible</summary>
+
+```bash
+# Upgrade pip
+pip install --upgrade pip
+
 # Install Ansible
-sudo apt install ansible -y
+pip install ansible
 
 # Verify installation
 ansible --version
@@ -205,35 +231,32 @@ ansible --version
 </details>
 
 <details>
-<summary>2. Install Python & pip</summary>
+<summary>4. Create Alias for Quick Access</summary>
 
 ```bash
-# Install Python and pip
-sudo apt install python3 python3-pip -y
+# Add alias to .bashrc
+echo "alias netdev='cd ~/ansible-project && source ansible-venv/bin/activate'" >> ~/.bashrc
 
-# Verify installation
-python3 --version
-pip3 --version
+# Reload bashrc
+source ~/.bashrc
+
+# Now just type 'netdev' to activate environment
 ```
 
 </details>
 
 <details>
-<summary>3. VS Code Remote SSH Setup</summary>
+<summary>5. VS Code Remote SSH Setup</summary>
 
 ```bash
-# Install OpenSSH Server on Linux node
-sudo apt install openssh-server -y
-
-# Start SSH service
-sudo systemctl start ssh
-sudo systemctl enable ssh
-
-# Check SSH status
-sudo systemctl status ssh
-
-# Get IP address for VS Code connection
+# Get Linux node IP
 ip addr show
+
+# In VS Code:
+# 1. Install "Remote - SSH" extension
+# 2. Press F1 → "Remote-SSH: Connect to Host"
+# 3. Enter: user@YOUR-LINUX-IP
+# 4. Select Linux, enter password
 ```
 
 </details>
@@ -247,7 +270,7 @@ ip addr show
 
 ## Video 3: Git Workflow for Network Engineers
 
-[▶️ Watch on YouTube](https://www.youtube.com/watch?v=VIDEO-3-ID)
+[▶️ Watch on YouTube](https://www.youtube.com/watch?v=vykDi7PFeW0)
 
 ### 📋 Overview
 
@@ -268,7 +291,7 @@ Learn Git version control essentials and push your Ansible projects to GitHub.
 # Install Git
 sudo apt install git -y
 
-# Configure Git
+# Configure Git identity
 git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
 
@@ -279,13 +302,34 @@ git config --list
 </details>
 
 <details>
-<summary>2. Initialize Repository</summary>
+<summary>2. Generate SSH Key for GitHub</summary>
 
 ```bash
-# Initialize new repository
+# Generate SSH key pair
+ssh-keygen -t rsa -b 4096 -C "your.email@example.com"
+
+# Start SSH agent and add key
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_rsa
+
+# Display public key (copy this to GitHub)
+cat ~/.ssh/id_rsa.pub
+
+# Test GitHub connection
+ssh -T git@github.com
+```
+
+</details>
+
+<details>
+<summary>3. Initialize Repository & First Commit</summary>
+
+```bash
+# Initialize repository
+cd ~/ansible-project
 git init
 
-# Add all files
+# Add files to staging
 git add .
 
 # First commit
@@ -295,11 +339,11 @@ git commit -m "Initial commit"
 </details>
 
 <details>
-<summary>3. Push to GitHub</summary>
+<summary>4. Push to GitHub</summary>
 
 ```bash
-# Add remote origin
-git remote add origin https://github.com/username/repo.git
+# Add remote origin (SSH method)
+git remote add origin git@github.com:username/repo.git
 
 # Push to main branch
 git push -u origin main
@@ -308,7 +352,38 @@ git push -u origin main
 </details>
 
 <details>
-<summary>4. Common Git Commands</summary>
+<summary>5. Configure .gitignore</summary>
+
+```bash
+# Create .gitignore
+cat > .gitignore << 'EOF'
+# Virtual Environments
+ansible-venv/
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+EOF
+
+# If venv was already tracked, remove it
+git rm -r --cached ansible-venv/
+git add .gitignore
+git commit -m "Add gitignore and remove venv from tracking"
+```
+
+</details>
+
+<details>
+<summary>6. Common Git Commands</summary>
 
 ```bash
 # Check status
@@ -325,6 +400,10 @@ git merge feature-branch
 
 # Pull latest changes
 git pull origin main
+
+# Stash changes
+git stash
+git stash pop
 ```
 
 </details>
@@ -332,7 +411,7 @@ git pull origin main
 ### 🔗 Resources
 
 - [Git Documentation](https://git-scm.com/doc)
-- [GitHub Guides](https://guides.github.com/)
+- [GitHub SSH Setup](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
 
 ---
 
@@ -353,7 +432,7 @@ Install and configure FortiGate firewall in your EVE-NG virtual lab.
 ### 💻 Commands
 
 <details>
-<summary>1. Upload FortiGate Image</summary>
+<summary>1. Upload FortiGate Image to EVE-NG</summary>
 
 ```bash
 # Upload FortiGate qcow2 image via SFTP to:
@@ -387,12 +466,20 @@ config system interface
         set allowaccess ping https ssh http
     next
 end
+
+# Set default gateway
+config router static
+    edit 1
+        set gateway 192.168.1.1
+        set device port1
+    next
+end
 ```
 
 </details>
 
 <details>
-<summary>3. Enable API Access</summary>
+<summary>3. Create API Admin User</summary>
 
 ```bash
 # Create API admin user
@@ -408,7 +495,7 @@ config system api-user
     next
 end
 
-# Generate API token (from GUI)
+# Generate API token from GUI:
 # System > Administrators > api-admin > Regenerate
 ```
 
@@ -417,7 +504,6 @@ end
 ### 🔗 Resources
 
 - [FortiGate Documentation](https://docs.fortinet.com/product/fortigate)
-- [EVE-NG FortiGate Setup](https://www.eve-ng.net/index.php/documentation/howtos/)
 
 ---
 
@@ -475,6 +561,9 @@ ansible-galaxy collection list | grep fortinet
 # Create encrypted vault file
 ansible-vault create host_vars/Forti-FW-1.yml
 
+# View encrypted file (shows encrypted text)
+cat host_vars/Forti-FW-1.yml
+
 # View decrypted content
 ansible-vault view host_vars/Forti-FW-1.yml
 
@@ -496,6 +585,9 @@ ansible-inventory --list -i inventory/hosts --ask-vault-pass
 
 # Check specific host variables
 ansible-inventory --host Forti-FW-1 --ask-vault-pass
+
+# View inventory in YAML format
+ansible-inventory --list -i inventory/hosts --ask-vault-pass --yaml
 ```
 
 </details>
@@ -510,6 +602,9 @@ ansible-playbook playbooks/fortigate_system_info.yml --ask-vault-pass
 # Run with verbose output
 ansible-playbook playbooks/fortigate_system_info.yml --ask-vault-pass -vvv
 
+# Create firewall policy
+ansible-playbook playbooks/fortigate_create_policy.yml --ask-vault-pass
+
 # Dry run (check mode)
 ansible-playbook playbooks/fortigate_create_policy.yml --ask-vault-pass --check
 ```
@@ -517,7 +612,7 @@ ansible-playbook playbooks/fortigate_create_policy.yml --ask-vault-pass --check
 </details>
 
 <details>
-<summary>5. Inventory File Example</summary>
+<summary>5. Inventory File (inventory/hosts)</summary>
 
 ```ini
 [fortigates]
@@ -557,45 +652,79 @@ Automate FortiGate using REST API with Postman and VS Code integration.
 ### 💻 Commands
 
 <details>
-<summary>1. Get System Status (cURL)</summary>
+<summary>1. Test API with cURL</summary>
 
 ```bash
 # Get system status
-curl -k -X GET "https://192.168.1.111/api/v2/monitor/system/status" \
+curl -k -X GET "https://192.168.1.111/api/v2/monitor/system/status?vdom=root" \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+
+# Get firewall addresses
+curl -k -X GET "https://192.168.1.111/api/v2/cmdb/firewall/address?vdom=root" \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+
+# Get firewall policies
+curl -k -X GET "https://192.168.1.111/api/v2/cmdb/firewall/policy?vdom=root" \
   -H "Authorization: Bearer YOUR_API_TOKEN"
 ```
 
 </details>
 
 <details>
-<summary>2. Get Firewall Policies</summary>
+<summary>2. Create Address Object (POST)</summary>
 
 ```bash
-# List all firewall policies
-curl -k -X GET "https://192.168.1.111/api/v2/cmdb/firewall/policy" \
-  -H "Authorization: Bearer YOUR_API_TOKEN"
-```
-
-</details>
-
-<details>
-<summary>3. Create Firewall Policy</summary>
-
-```bash
-# Create new policy
-curl -k -X POST "https://192.168.1.111/api/v2/cmdb/firewall/policy" \
+curl -k -X POST "https://192.168.1.111/api/v2/cmdb/firewall/address?vdom=root" \
   -H "Authorization: Bearer YOUR_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Allow-Web",
+    "name": "WebServer-1",
+    "type": "ipmask",
+    "subnet": "10.0.10.100 255.255.255.255",
+    "comment": "Web server created via API"
+  }'
+```
+
+</details>
+
+<details>
+<summary>3. Create Firewall Policy (POST)</summary>
+
+```bash
+curl -k -X POST "https://192.168.1.111/api/v2/cmdb/firewall/policy?vdom=root" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Allow-Web-Traffic",
     "srcintf": [{"name": "port1"}],
     "dstintf": [{"name": "port2"}],
     "srcaddr": [{"name": "all"}],
-    "dstaddr": [{"name": "all"}],
+    "dstaddr": [{"name": "WebServer-1"}],
     "service": [{"name": "HTTP"}, {"name": "HTTPS"}],
     "action": "accept",
     "status": "enable"
   }'
+```
+
+</details>
+
+<details>
+<summary>4. Common API Endpoints</summary>
+
+```bash
+# System Information
+/api/v2/monitor/system/status
+/api/v2/monitor/system/interface
+/api/v2/cmdb/system/global
+
+# Firewall
+/api/v2/cmdb/firewall/address
+/api/v2/cmdb/firewall/policy
+/api/v2/cmdb/firewall/service/custom
+
+# Routing
+/api/v2/cmdb/router/static
+/api/v2/monitor/router/ipv4
 ```
 
 </details>
@@ -627,6 +756,12 @@ Deploy NetBox with Docker Compose for IPAM and DCIM management.
 <summary>1. Install Docker</summary>
 
 ```bash
+# Install OpenSSH Server
+sudo apt install openssh-server -y
+
+# Update system
+sudo apt update && sudo apt upgrade -y
+
 # Install Docker + Docker Compose
 sudo apt install -y docker.io docker-compose
 
@@ -667,6 +802,9 @@ cp docker-compose.override.yml.example docker-compose.override.yml
 # Pull images
 docker-compose pull
 
+# List pulled images
+docker images | grep netbox
+
 # Start NetBox stack
 docker-compose up -d
 
@@ -675,6 +813,9 @@ docker-compose ps
 
 # Verify port listening
 ss -tuln | grep :8000
+
+# Test web access
+curl -I http://localhost:8000
 ```
 
 </details>
@@ -683,12 +824,16 @@ ss -tuln | grep :8000
 <summary>4. Troubleshooting</summary>
 
 ```bash
+# Restart NetBox container
+sudo docker-compose restart netbox
+
+# Stop everything
+docker-compose down
+
 # View logs
 docker-compose logs
 docker-compose logs netbox
-
-# Restart NetBox
-docker-compose restart netbox
+docker-compose logs postgres
 
 # Nuclear reset (removes all data!)
 docker-compose down -v
@@ -731,16 +876,34 @@ Understand the architecture of auto-discovery stack with ORB, DIODE, and NetBox.
 ### 🏗️ Architecture
 
 ```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│  Network    │     │    ORB      │     │   DIODE     │
-│  Devices    │────▶│   Agent     │────▶│   Server    │
-└─────────────┘     └─────────────┘     └─────────────┘
-                                              │
-                                              ▼
-                                        ┌─────────────┐
-                                        │   NetBox    │
-                                        │   (DCIM)    │
-                                        └─────────────┘
+┌─────────────────┐      SNMP/SSH      ┌──────────────┐
+│  Network        │ <──────────────────│  ORB Agent   │
+│  Devices        │                     │  (Discovery) │
+└─────────────────┘                     └──────┬───────┘
+                                               │
+                                               │ gRPC (8080)
+                                               ↓
+                                        ┌──────────────┐
+                                        │ DIODE Server │
+                                        │ (Ingestion)  │
+                                        └──────┬───────┘
+                                               │
+                                               │ OAuth2
+                                               ↓
+                                        ┌──────────────┐
+                                        │   NetBox     │
+                                        │   (DCIM)     │
+                                        └──────────────┘
+```
+
+### 🔐 OAuth2 Flow
+
+```
+ORB Agent → Hydra (OAuth) → DIODE Server → NetBox
+
+Credentials:
+- orb-agent uses: "diode-ingest" client
+- DIODE Server uses: "diode-to-netbox" client
 ```
 
 ### 🔗 Resources
@@ -772,9 +935,12 @@ Complete setup guide for NetBox auto-discovery with DIODE and ORB Agent.
 <summary>1. Deploy DIODE Server</summary>
 
 ```bash
+# Create directory
+mkdir -p ~/netbox-discovery/diode
+cd ~/netbox-discovery/diode
+
 # Clone DIODE repository
-git clone https://github.com/netboxlabs/diode.git
-cd diode
+git clone https://github.com/netboxlabs/diode.git .
 
 # Start DIODE with Docker Compose
 docker-compose up -d
@@ -786,15 +952,18 @@ docker-compose ps
 </details>
 
 <details>
-<summary>2. Install NetBox DIODE Plugin</summary>
+<summary>2. Create OAuth Client for ORB Agent</summary>
 
 ```bash
-# Add to NetBox docker-compose.override.yml
-# Under netbox service, add:
-#   PLUGINS: "netbox_diode"
+# Create new OAuth client
+docker compose exec hydra hydra create client \
+  --endpoint http://localhost:4445 \
+  --name orb-agent-discovery \
+  --grant-type client_credentials \
+  --scope diode:ingest \
+  --token-endpoint-auth-method client_secret_post
 
-# Restart NetBox
-docker-compose restart netbox
+# Save the CLIENT ID and CLIENT SECRET from output!
 ```
 
 </details>
@@ -803,15 +972,44 @@ docker-compose restart netbox
 <summary>3. Configure ORB Agent</summary>
 
 ```bash
-# Download ORB Agent
-# Configure orb-agent.yaml with:
-# - NetBox URL
-# - DIODE Server URL
-# - OAuth credentials
-# - Target network devices
+# Create ORB Agent directory
+mkdir -p ~/netbox-discovery/orb-agent
+cd ~/netbox-discovery/orb-agent
 
-# Start ORB Agent
-./orb-agent run -c orb-agent.yaml
+# Create config.yaml
+cat > config.yaml << 'EOF'
+common:
+  diode:
+    target: grpc://localhost:8080/diode
+    client_id: YOUR_CLIENT_ID
+    client_secret: YOUR_CLIENT_SECRET
+    agent_name: orb-netbox-discovery
+    tls:
+      insecure: true
+
+discovery:
+  - name: network-discovery
+    type: napalm
+    config:
+      driver: ios
+      hostname: 192.168.1.11
+      username: admin
+      password: Cisco123
+EOF
+```
+
+</details>
+
+<details>
+<summary>4. Check DIODE Environment Variables</summary>
+
+```bash
+# View DIODE credentials
+cat /opt/diode/.env | grep -E "CLIENT_ID|CLIENT_SECRET"
+
+# Example output:
+# DIODE_TO_NETBOX_CLIENT_ID=diode-to-netbox
+# DIODE_TO_NETBOX_CLIENT_SECRET=ILf91k5L8+...
 ```
 
 </details>
@@ -843,9 +1041,8 @@ Network testing with pyATS and automated inventory sync with NetBox.
 <summary>1. Install pyATS</summary>
 
 ```bash
-# Create virtual environment
-python3 -m venv pyats-env
-source pyats-env/bin/activate
+# Activate virtual environment
+source ~/ansible-project/ansible-venv/bin/activate
 
 # Install pyATS
 pip install pyats[full]
@@ -857,43 +1054,112 @@ pyats version check
 </details>
 
 <details>
-<summary>2. Create Testbed File</summary>
+<summary>2. Set Environment Variables</summary>
 
-```yaml
-# testbed.yaml
-testbed:
-  name: Network-Lab
+```bash
+# Set NetBox credentials
+export NETBOX_URL="http://192.168.1.120:8000"
+export NETBOX_USER_TOKEN="your-netbox-api-token"
+export DEF_PYATS_USER="admin"
+export DEF_PYATS_PASS="Cisco123"
 
-devices:
-  router1:
-    os: ios
-    type: router
-    connections:
-      defaults:
-        class: unicon.Unicon
-      ssh:
-        protocol: ssh
-        ip: 192.168.1.10
-    credentials:
-      default:
-        username: admin
-        password: cisco123
+# Verify variables are set
+env | grep -E "NETBOX|PYATS"
+
+# Make persistent (add to .bashrc)
+echo 'export NETBOX_URL="http://192.168.1.120:8000"' >> ~/.bashrc
+echo 'export NETBOX_USER_TOKEN="your-token"' >> ~/.bashrc
+echo 'export DEF_PYATS_USER="admin"' >> ~/.bashrc
+echo 'export DEF_PYATS_PASS="Cisco123"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 </details>
 
 <details>
-<summary>3. Run pyATS Tests</summary>
+<summary>3. Test NetBox API Connection</summary>
 
 ```bash
-# Connect to device
-pyats shell --testbed testbed.yaml
+# Test API endpoint
+curl -s -H "Authorization: Token ${NETBOX_USER_TOKEN}" \
+    "${NETBOX_URL}/api/" | head -30
 
-# Run a job
-pyats run job my_job.py --testbed testbed.yaml
+# List all devices
+curl -s -H "Authorization: Token ${NETBOX_USER_TOKEN}" \
+    "${NETBOX_URL}/api/dcim/devices/" | python3 -m json.tool | head -50
+```
 
-# Parse command output
-pyats parse "show version" --testbed testbed.yaml --device router1
+</details>
+
+<details>
+<summary>4. Generate Testbed from NetBox</summary>
+
+```bash
+# Generate testbed from NetBox (with site filter)
+pyats create testbed netbox \
+    --output testbed.yaml \
+    --netbox-url=${NETBOX_URL} \
+    --user-token=${NETBOX_USER_TOKEN} \
+    --def_user='%ENV{DEF_PYATS_USER}' \
+    --def_pass='%ENV{DEF_PYATS_PASS}' \
+    --url_filter='site=main-dc'
+
+# Validate testbed
+pyats validate testbed testbed.yaml
+```
+
+</details>
+
+<details>
+<summary>5. Run pyATS Commands</summary>
+
+```bash
+# Parse show version on a device
+genie parse "show version" --testbed-file testbed.yaml --device vIOS-R1
+
+# Parse show ip interface brief
+genie parse "show ip interface brief" --testbed-file testbed.yaml --device vIOS-R1
+
+# Learn all features (BGP, OSPF, interfaces, etc.)
+genie learn all --testbed-file testbed.yaml --device vIOS-R1
+```
+
+</details>
+
+<details>
+<summary>6. Manual Testbed File Example</summary>
+
+```yaml
+# testbed.yaml
+---
+testbed:
+  name: EVE-NG-Network-Lab
+  credentials:
+    default:
+      username: admin
+      password: Cisco123
+    enable:
+      password: Cisco123
+
+devices:
+  R1:
+    os: iosxe
+    platform: csr1000v
+    type: router
+    connections:
+      cli:
+        protocol: ssh
+        ip: 192.168.1.11
+        port: 22
+
+  R2:
+    os: iosxe
+    platform: csr1000v
+    type: router
+    connections:
+      cli:
+        protocol: ssh
+        ip: 192.168.1.12
 ```
 
 </details>

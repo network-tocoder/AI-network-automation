@@ -22,7 +22,7 @@
   <a href="https://www.linkedin.com/in/hadeek"><img src="https://img.shields.io/badge/Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
   <a href="https://github.com/network-tocoder"><img src="https://img.shields.io/badge/Projects-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
 </p>
----
+
 
 ## 🎓 What You'll Learn
 

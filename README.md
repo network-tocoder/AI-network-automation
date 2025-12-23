@@ -4,9 +4,7 @@
   </a>
 </p>
 
-<p align="center">
-  <img src="assets/banner.jpg" alt="Network Coder Banner" width="450">
-</p>
+
 
 <p align="center">
   <img src="https://img.shields.io/badge/AI-8A2BE2?style=for-the-badge&logo=openai&logoColor=white" />

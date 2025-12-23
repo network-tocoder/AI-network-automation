@@ -5,6 +5,14 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/Network-007ACC?style=for-the-badge" alt="Network">
+  <img src="https://img.shields.io/badge/AI-8A2BE2?style=for-the-badge" alt="AI">
+  <img src="https://img.shields.io/badge/MCP-FF8C00?style=for-the-badge" alt="MCP">
+  <img src="https://img.shields.io/badge/Automation-D1242F?style=for-the-badge" alt="Automation">
+  <img src="https://img.shields.io/badge/Virtual_LAB-228B22?style=for-the-badge" alt="Virtual Lab">
+</p>
+
+<p align="center">
   <a href="https://youtube.com/@NetworkCoder"><img src="https://img.shields.io/badge/Tutorials-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="YouTube"></a>
   <a href="https://www.linkedin.com/in/hadeek"><img src="https://img.shields.io/badge/Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
   <a href="https://github.com/network-tocoder"><img src="https://img.shields.io/badge/Projects-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>

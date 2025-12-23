@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://youtube.com/@NetworkCoder"><img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="YouTube"></a>
-  <a href="https://youtube.com/@NetworkCoder"><img src="https://img.shields.io/badge/NetworkCoder-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="NetworkCoder"></a>
+  <a href="https://www.linkedin.com/in/YOUR_USERNAME"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
   <a href="https://github.com/network-tocoder"><img src="https://img.shields.io/badge/GitHub-6e5494?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
   <a href="https://github.com/network-tocoder"><img src="https://img.shields.io/badge/Follow-00CED1?style=for-the-badge&logo=github&logoColor=white" alt="Follow"></a>
 </p>

@@ -1,5 +1,7 @@
 <p align="center">
-  <img src="https://capsule-render.vercel.app/render?type=soft&color=auto&height=120&section=header&text=Network%20Automation%20Series&fontSize=50&animation=fadeIn&fontAlignY=55" alt="Network Automation Series Header">
+  <a href="https://git.io/typing-svg">
+    <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=35&pause=1000&color=00CED1&center=true&vCenter=true&width=600&lines=Network+Automation+Series;Building+Intent-Based+Networks;AI-Powered+Networking+with+MCP" alt="Typing SVG" />
+  </a>
 </p>
 
 <p align="center">

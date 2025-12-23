@@ -1,7 +1,13 @@
 <p align="center">
-  <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=45&pause=1000&color=00F5FF&vCenter=true&center=true&width=1200&lines=Network+Automation+Series;Building+Intent-Based+Networks;AI-Powered+Networking+with+MCP" alt="Network Automation Series" />
-  </a>
+  <img src="banner.jpg" alt="Network Coder Banner" width="450">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/AI_Agents-141414?style=for-the-badge&logo=openai&logoColor=00F5FF" alt="AI">
+  <img src="https://img.shields.io/badge/MCP-141414?style=for-the-badge&logo=anthropic&logoColor=00F5FF" alt="MCP">
+  <img src="https://img.shields.io/badge/NetBox-141414?style=for-the-badge&logo=netbox&logoColor=00F5FF" alt="NetBox">
+  <img src="https://img.shields.io/badge/Python-141414?style=for-the-badge&logo=python&logoColor=00F5FF" alt="Python">
+  <img src="https://img.shields.io/badge/Ansible-141414?style=for-the-badge&logo=ansible&logoColor=00F5FF" alt="Ansible">
 </p>
 
 <p align="center">

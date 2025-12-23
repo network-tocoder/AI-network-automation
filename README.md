@@ -2,10 +2,16 @@
 
 ![Network Coder Banner](assets/banner.jpg)
 
-**Network | AI | Tool Integration | Virtual LAB | Automation**
+<p align="center">
+  <img src="https://img.shields.io/badge/Network_%7C_AI_%7C_Tool_Integration_%7C_Virtual_LAB_%7C_Automation-00CED1?style=for-the-badge" alt="Tagline">
+</p>
 
-[![YouTube](https://img.shields.io/badge/YouTube-NetworkCoder-red?style=for-the-badge&logo=youtube)](https://youtube.com/@NetworkCoder)
-[![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=for-the-badge&logo=github)](https://github.com/network-tocoder)
+<p align="center">
+  <a href="https://youtube.com/@NetworkCoder"><img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="YouTube"></a>
+  <a href="https://youtube.com/@NetworkCoder"><img src="https://img.shields.io/badge/NetworkCoder-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="NetworkCoder"></a>
+  <a href="https://github.com/network-tocoder"><img src="https://img.shields.io/badge/GitHub-6e5494?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+  <a href="https://github.com/network-tocoder"><img src="https://img.shields.io/badge/Follow-00CED1?style=for-the-badge&logo=github&logoColor=white" alt="Follow"></a>
+</p>
 
 ---
 
@@ -17,19 +23,19 @@ This series takes you from zero to hero in network automation. Build a complete 
 
 ## 📺 Video Index
 
-| # | Video | Topic | Resources |
-|---|-------|-------|-----------|
-| 1 | [EVE-NG Installation](#video-1-eve-ng-installation--first-virtual-lab) | EVE-NG, Virtual Lab Setup | [📁 Folder](./video-01/) |
-| 2 | [Build Automation Environment](#video-2-build-automation-environment-inside-eve-ng) | Linux, Ansible, VS Code | [📁 Folder](./video-02/) |
-| 3 | [Git Workflow](#video-3-git-workflow-for-network-engineers) | Git, GitHub, Version Control | [📁 Folder](./video-03/) |
-| 4 | [Deploy FortiGate](#video-4-deploy-fortigate-firewall-on-eve-ng) | FortiGate, EVE-NG | [📁 Folder](./video-04/) |
-| 5 | [FortiGate Ansible](#video-5-fortigate-firewall-using-ansible) | Ansible, FortiGate, Vault | [📁 Folder](./video-05/) |
-| 6 | [FortiGate REST API](#video-6-fortigate-automation-using-rest-api) | REST API, Postman | [📁 Folder](./video-06/) |
-| 7 | [NetBox Docker](#video-7-netbox-installation-using-docker) | NetBox, Docker | [📁 Folder](./video-07/) |
-| 8 | [NetBox Dynamic Inventory](#video-8-netbox-dynamic-inventory---core-concepts-explained) | DIODE, ORB, Architecture | [📁 Folder](./video-08/) |
-| 9 | [NetBox Auto-Discovery](#video-9-netbox-auto-discovery---complete-setup-guide) | DIODE, ORB Agent, OAuth | [📁 Folder](./video-09/) |
-| 10 | [pyATS + NetBox](#video-10-pyats--netbox-integration) | pyATS, Testing, NetBox | [📁 Folder](./video-10/) |
-| 11 | [NetBox + MCP Integration](#video-11-netbox--mcp-integration) | MCP, Claude Code, AI | [📁 Folder](./video-11/) |
+| # | Video | Topic | 🎬 Watch |
+|---|-------|-------|----------|
+| 1 | [EVE-NG Installation](#video-1-eve-ng-installation--first-virtual-lab) | EVE-NG, Virtual Lab Setup | [▶️ YouTube](https://www.youtube.com/watch?v=ABNOS7GypxA) |
+| 2 | [Build Automation Environment](#video-2-build-automation-environment-inside-eve-ng) | Linux, Ansible, VS Code | [▶️ YouTube](https://www.youtube.com/watch?v=NPq7AjCguBY) |
+| 3 | [Git Workflow](#video-3-git-workflow-for-network-engineers) | Git, GitHub, Version Control | [▶️ YouTube](https://www.youtube.com/watch?v=vykDi7PFeW0) |
+| 4 | [Deploy FortiGate](#video-4-deploy-fortigate-firewall-on-eve-ng) | FortiGate, EVE-NG | [▶️ YouTube](https://www.youtube.com/watch?v=8W9OJAP773s) |
+| 5 | [FortiGate Ansible](#video-5-fortigate-firewall-using-ansible) | Ansible, FortiGate, Vault | [▶️ YouTube](https://www.youtube.com/watch?v=3VL-JRIJT8M) |
+| 6 | [FortiGate REST API](#video-6-fortigate-automation-using-rest-api) | REST API, Postman | [▶️ YouTube](https://www.youtube.com/watch?v=Eqy4q9SsmtE) |
+| 7 | [NetBox Docker](#video-7-netbox-installation-using-docker) | NetBox, Docker | [▶️ YouTube](https://www.youtube.com/watch?v=OGQGly7NIFY) |
+| 8 | [NetBox Dynamic Inventory](#video-8-netbox-dynamic-inventory---core-concepts-explained) | DIODE, ORB, Architecture | [▶️ YouTube](https://www.youtube.com/watch?v=JZ-jDCT8mQY) |
+| 9 | [NetBox Auto-Discovery](#video-9-netbox-auto-discovery---complete-setup-guide) | DIODE, ORB Agent, OAuth | [▶️ YouTube](https://www.youtube.com/watch?v=DODzEsMTmKQ) |
+| 10 | [pyATS + NetBox](#video-10-pyats--netbox-integration) | pyATS, Testing, NetBox | [▶️ YouTube](https://www.youtube.com/watch?v=V_PmWxC2QDA) |
+| 11 | [NetBox + MCP Integration](#video-11-netbox--mcp-integration) | MCP, Claude Code, AI | [▶️ YouTube](https://www.youtube.com/watch?v=YOUR_VIDEO_ID) |
 
 ---
 
@@ -822,7 +828,7 @@ claude
 ## 🤝 Connect With Me
 
 [![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtube.com/@NetworkCoder)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/hadeek/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/YourProfile)
 
 ---
 

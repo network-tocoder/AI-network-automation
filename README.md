@@ -1,4 +1,4 @@
-# 🚀 Network Automation Series
+# Network Automation Series
 
 <p align="center">
   <img src="assets/banner.jpg" alt="Network Coder Banner" width="450">
@@ -21,7 +21,7 @@
 
 ## 🎓 What You'll Learn
 
-This series takes you from zero to hero in network automation. Build a complete virtual lab, automate firewalls, deploy NetBox for infrastructure management, and integrate everything with modern DevOps tools.
+This series takes you from zero to hero in network automation. Build a complete virtual lab in EVE-NG, automate firewalls, deploy NetBox for infrastructure management, and integrate everything with modern DevOps tools and AI.
 
 ---
 

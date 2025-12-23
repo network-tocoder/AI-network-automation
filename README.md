@@ -7,9 +7,9 @@
 </p>
 
 <p align="center">
-  <a href="https://youtube.com/@NetworkCoder"><img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="YouTube"></a>
-  <a href="https://www.linkedin.com/in/YOUR_USERNAME"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
-  <a href="https://github.com/network-tocoder?tab=followers"><img src="https://img.shields.io/github/followers/network-tocoder?label=Followers&style=for-the-badge&color=00CED1" alt="GitHub Followers"></a>
+  <a href="https://youtube.com/@NetworkCoder"><img src="https://img.shields.io/badge/Tutorials-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="YouTube"></a>
+  <a href="https://www.linkedin.com/in/YOUR_USERNAME"><img src="https://img.shields.io/badge/Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
+  <a href="https://github.com/network-tocoder"><img src="https://img.shields.io/badge/Projects-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
 </p>
 ---
 

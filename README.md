@@ -3,7 +3,7 @@
 ![Network Coder Banner](assets/banner.jpg)
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Network_%7C_AI_%7C_Tool_Integration_%7C_Virtual_LAB_%7C_Automation-00CED1?style=for-the-badge" alt="Tagline">
+  <img src="assets/banner.jpg" alt="Network Coder Banner" width="800">
 </p>
 
 <p align="center">

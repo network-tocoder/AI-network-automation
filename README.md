@@ -1,4 +1,6 @@
-# Network Automation Series
+<p align="center">
+  <img src="https://capsule-render.vercel.app/render?type=soft&color=auto&height=120&section=header&text=Network%20Automation%20Series&fontSize=50&animation=fadeIn&fontAlignY=55" alt="Network Automation Series Header">
+</p>
 
 <p align="center">
   <img src="assets/banner.jpg" alt="Network Coder Banner" width="450">

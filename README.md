@@ -1,7 +1,7 @@
 # 🚀 Network Automation Series
 
 <p align="center">
-  <img src="assets/banner.jpg" alt="Network Coder Banner" width="800">
+  <img src="assets/banner.jpg" alt="Network Coder Banner" width="500">
 </p>
 
 <p align="center">

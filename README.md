@@ -1485,180 +1485,288 @@ Architecture overview of the auto-discovery stack: ORB, DIODE, and NetBox workin
 
 ### 📋 Overview
 
-Complete setup guide for NetBox auto-discovery with DIODE and ORB Agent.
+Complete setup guide for NetBox auto-discovery with DIODE and ORB Agent - clean installation from scratch.
 
 ### 🎯 What You'll Learn
 
-- Deploy DIODE Server with Docker
-- Install NetBox DIODE Plugin
-- Configure ORB Agent
-- Set up OAuth authentication
+- Install Docker Compose v2
+- Deploy DIODE Server using quickstart script
+- Install NetBox DIODE Plugin manually inside container
+- Configure NetBox for DIODE Plugin
+- Set up ORB Agent with OAuth credentials
 - Run auto-discovery
 
 ### 💻 Commands
 
 <details>
-<summary>1. Create Project Directory Structure</summary>
+<summary>Prerequisites Check</summary>
 
 ```bash
-# Create main directory
-mkdir -p ~/netbox-discovery/{diode,orb-agent}
-cd ~/netbox-discovery
+# Verify Docker is installed
+docker --version
 
-# Directory structure
-tree ~/netbox-discovery/
-# netbox-discovery/
-# ├── diode/
-# │   ├── docker-compose.yml
-# │   └── .env
-# └── orb-agent/
-#     ├── docker-compose.yml
-#     └── config.yaml
+# Verify Docker Compose v2
+docker compose version
+
+# Check network connectivity
+ping -c 3 google.com
 ```
 
 </details>
 
 <details>
-<summary>2. Deploy DIODE Server</summary>
+<summary>SECTION 1: Install Docker Compose v2</summary>
+
+```bash
+# Remove old version
+sudo apt remove docker-compose -y
+
+# Install Docker Compose v2
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+# Set permissions
+sudo chmod +x /usr/local/bin/docker-compose
+
+# Verify
+docker compose version
+```
+
+</details>
+
+<details>
+<summary>SECTION 2: Create Directory Structure</summary>
+
+```bash
+cd ~
+mkdir -p netbox-discovery/{diode,orb-agent}
+cd netbox-discovery
+```
+
+</details>
+
+<details>
+<summary>SECTION 3: Install DIODE Server</summary>
 
 ```bash
 cd ~/netbox-discovery/diode
 
-# Clone DIODE quickstart
-git clone https://github.com/netboxlabs/diode-quickstart.git .
+# Download quickstart script
+curl -o diode-quickstart.sh https://raw.githubusercontent.com/netboxlabs/diode/main/diode-quickstart.sh
 
-# Or create docker-compose.yml manually
-cat << 'EOF' > docker-compose.yml
-services:
-  diode-server:
-    image: netboxlabs/diode-server:latest
-    container_name: diode-server
-    ports:
-      - "8080:8080"
-      - "8081:8081"
-    environment:
-      - DIODE_TO_NETBOX_NETBOX_URL=http://192.168.1.120:8000
-      - DIODE_TO_NETBOX_CLIENT_ID=diode-to-netbox
-      - DIODE_TO_NETBOX_CLIENT_SECRET=${DIODE_TO_NETBOX_CLIENT_SECRET}
-    restart: unless-stopped
-    
-  hydra:
-    image: oryd/hydra:v2.2.0
-    container_name: hydra
-    ports:
-      - "4444:4444"
-      - "4445:4445"
-    command: serve all --dev
-    restart: unless-stopped
-EOF
+# Make executable
+chmod +x diode-quickstart.sh
 
-# Create .env file
-cat << 'EOF' > .env
-DIODE_TO_NETBOX_CLIENT_ID=diode-to-netbox
-DIODE_TO_NETBOX_CLIENT_SECRET=your-secret-key-here
-EOF
+# Run script (replace IP with your NetBox IP)
+./diode-quickstart.sh --netbox-url http://192.168.1.120:8000
 
-# Start DIODE stack
-docker-compose up -d
+# Wait for completion...
 
-# Verify containers
-docker-compose ps
-docker-compose logs -f
+# Verify files created
+ls -la
+
+# View OAuth credentials (SAVE THESE!)
+cat oauth2/client/client-credentials.json
+
+# Start DIODE
+docker compose up -d
+
+# Wait 30 seconds
+sleep 30
+
+# Check status
+docker compose ps
+
+# Verify all containers are running
 ```
 
 </details>
 
 <details>
-<summary>3. Install NetBox DIODE Plugin</summary>
+<summary>SECTION 4: Install NetBox DIODE Plugin</summary>
 
 ```bash
-# Navigate to netbox-docker directory
 cd ~/netbox-docker
 
-# Edit docker-compose.override.yml
-nano docker-compose.override.yml
+# Ensure NetBox is running
+docker compose ps
+
+# Enter container as root
+docker compose exec -u root netbox bash
 ```
 
-**Add to docker-compose.override.yml:**
+**Inside container:**
+```bash
+apt update && apt install -y python3-pip
+
+pip3 install --target=/opt/netbox/venv/lib/python3.12/site-packages \
+  --break-system-packages \
+  netboxlabs-diode-netbox-plugin
+
+# Verify installation
+ls -la /opt/netbox/venv/lib/python3.12/site-packages/ | grep -i diode
+
+pip3 list | grep diode
+
+/opt/netbox/venv/bin/python3 -c "import netbox_diode_plugin; print('Plugin OK')"
+
+exit
+```
+
+**Back on host:**
+```bash
+# Commit container as image
+docker commit netbox-docker-netbox-1 netbox-with-diode:latest
+
+# Verify image
+docker images | grep netbox-with-diode
+
+# Stop NetBox
+docker compose down
+```
+
+</details>
+
+<details>
+<summary>SECTION 5: Configure NetBox for DIODE Plugin</summary>
+
+```bash
+cd ~/netbox-docker
+
+# Update docker-compose.yml
+code docker-compose.yml
+```
+
+**Edit docker-compose.yml:**
+
+Find:
 ```yaml
-services:
-  netbox:
-    ports:
-      - "8000:8080"
-    environment:
-      - PLUGINS=["netbox_diode_plugin"]
-      
-  netbox-worker:
-    environment:
-      - PLUGINS=["netbox_diode_plugin"]
+netbox: &netbox
+  image: docker.io/netboxcommunity/netbox:${VERSION-v4.4-3.4.1}
 ```
 
+Change to:
+```yaml
+netbox: &netbox
+  image: netbox-with-diode:latest
+  # image: docker.io/netboxcommunity/netbox:${VERSION-v4.4-3.4.1}
+```
+
+**Save and exit**
+
 ```bash
-# Create plugin requirements file
-mkdir -p ~/netbox-docker/plugin_requirements
-echo "netbox-diode-plugin" > ~/netbox-docker/plugin_requirements/requirements.txt
+# Configure plugin
+code configuration/plugins.py
+```
 
-# Restart NetBox
-docker-compose down
-docker-compose up -d
+**Get credentials from DIODE:**
+```bash
+# First, get the netbox-to-diode credentials
+cat ~/netbox-discovery/diode/oauth2/client/client-credentials.json | grep -A 3 "netbox-to-diode"
+```
 
-# Verify plugin is loaded
-docker-compose logs netbox | grep -i diode
+**Add to plugins.py:**
+```python
+PLUGINS = [
+    'netbox_diode_plugin',
+]
+
+PLUGINS_CONFIG = {
+    'netbox_diode_plugin': {
+        'diode_target_override': 'grpc://192.168.1.120:8080/diode',
+        'diode_client_id': 'netbox-to-diode',
+        'diode_client_secret': 'K75KBCHg8E6c6CbhwEumby8ct8cApoI8MpM0uMR4g=',
+    }
+}
+```
+
+**Save and exit**
+
+```bash
+# Start NetBox
+docker compose up -d
+
+# Wait for healthy
+sleep 60
+
+# Check status
+docker compose ps
+
+# Run migrations
+docker compose exec netbox python3 /opt/netbox/netbox/manage.py migrate
+
+# Restart
+docker compose restart netbox netbox-worker
+
+# Check logs
+docker compose logs netbox | grep -i plugin
+docker compose logs netbox | tail -30
 ```
 
 </details>
 
 <details>
-<summary>4. Configure NetBox DIODE Settings</summary>
+<summary>SECTION 6: Verify NetBox Plugin</summary>
 
 ```bash
-# Access NetBox UI: http://192.168.1.120:8000
-# Login as admin
+# Check plugin loaded
+docker compose exec netbox pip list | grep diode
 
-# Navigate to:
-# Plugins > DIODE > Settings
-
-# Configure:
-# - DIODE Target: grpc://localhost:8080
-# - Enable plugin
-
-# Create OAuth Client Credentials:
-# Plugins > DIODE > Client Credentials > Add
-# - Name: orb-discovery
-# - Copy client_id and client_secret
+# Check logs
+docker compose logs netbox | grep -i diode
 ```
+
+**Verify in UI:**
+- Open: http://192.168.1.120:8000
+- Login
+- Check for "Diode" in sidebar menu
 
 </details>
 
 <details>
-<summary>5. Configure ORB Agent</summary>
+<summary>SECTION 7: Create ORB Agent OAuth Client</summary>
+
+**In NetBox UI:**
+1. Navigate to: Diode → Client Credentials
+2. Click "Create Client Credentials"
+3. Copy the `client_id` and `client_secret`
+
+**Save these for next step!**
+
+</details>
+
+<details>
+<summary>SECTION 8: Configure ORB Agent</summary>
 
 ```bash
 cd ~/netbox-discovery/orb-agent
 
-# Create config.yaml
-cat << 'EOF' > config.yaml
+# Create config file
+code config.yaml
+```
+
+**Add configuration (replace credentials):**
+```yaml
 orb:
   config_manager:
     active: local
-  
+
   backends:
     device_discovery:
     network_discovery:
-    
+
     common:
       diode:
-        target: grpc://192.168.1.120:8080/diode
-        client_id: orb-discovery-client-id
-        client_secret: your-client-secret-here
+        target: grpc://localhost:8080/diode
+        client_id: orb-discovery-a-2292af1c37b98c20
+        client_secret: YOUR_CLIENT_SECRET_HERE
         agent_name: orb-netbox-discovery
         tls:
           insecure: true
-      
+
       agent_labels:
         environment: lab
-        location: networkcoder-lab
-  
+        location: networkcoder
+
   policies:
     device_discovery:
       cisco_routers:
@@ -1666,6 +1774,7 @@ orb:
           schedule: "*/2 * * * *"
           defaults:
             site: Main-DC
+            tenant: NetworkCoder-Lab
             role: Router
             status: active
         scope:
@@ -1673,37 +1782,39 @@ orb:
             hostname: 192.168.1.101
             username: ansible
             password: ansible@123
-            optional_args:
-              secret: ansible@123
-          
+
           - driver: ios
             hostname: 192.168.1.102
             username: ansible
             password: ansible@123
-            optional_args:
-              secret: ansible@123
-          
+
           - driver: ios
             hostname: 192.168.1.103
             username: ansible
             password: ansible@123
-            optional_args:
-              secret: ansible@123
+
+    network_discovery:
+      lab_network_scan:
+        config:
+          schedule: "*/5 * * * *"
+        scope:
+          targets:
+            - 192.168.1.0/24
 
 logs:
   level: info
   format: json
-EOF
 ```
 
-</details>
-
-<details>
-<summary>6. Deploy ORB Agent</summary>
+**Save and exit**
 
 ```bash
-# Create docker-compose.yml for ORB Agent
-cat << 'EOF' > docker-compose.yml
+# Create docker-compose file
+code docker-compose.yml
+```
+
+**Add:**
+```yaml
 services:
   orb-agent:
     image: netboxlabs/orb-agent:latest
@@ -1711,10 +1822,16 @@ services:
     volumes:
       - ./config.yaml:/app/config.yaml
     restart: unless-stopped
-EOF
+```
 
+**Save and exit**
+
+```bash
 # Start ORB Agent
-docker-compose up -d
+docker compose up -d
+
+# Wait 10 seconds
+sleep 10
 
 # Check logs
 docker logs -f orb-agent
@@ -1723,42 +1840,244 @@ docker logs -f orb-agent
 </details>
 
 <details>
-<summary>7. Verify Discovery</summary>
+<summary>SECTION 9: Verification Commands</summary>
+
+### Check All Services Status
 
 ```bash
-# Check ORB Agent logs for discovery
-docker logs orb-agent | grep -i "discovered\|device\|success"
+# NetBox
+cd ~/netbox-docker
+docker compose ps
 
-# Check DIODE Server logs
+# DIODE
 cd ~/netbox-discovery/diode
-docker-compose logs -f diode-server
+docker compose ps
 
-# In NetBox UI:
-# - Devices > Devices (check for discovered devices)
-# - Plugins > DIODE > Change Log (view ingestion history)
+# ORB Agent
+cd ~/netbox-discovery/orb-agent
+docker logs orb-agent --tail 50
+```
+
+### Check Data Flow
+
+```bash
+# ORB Agent logs (device discovery)
+docker logs orb-agent | grep "Successful ingestion"
+
+# DIODE Ingester logs
+cd ~/netbox-discovery/diode
+docker compose logs diode-ingester | grep -i success
+
+# DIODE Reconciler logs
+docker compose logs diode-reconciler | grep -i "applied"
+
+# NetBox logs
+cd ~/netbox-docker
+docker compose logs netbox | grep -i diode
+```
+
+### Check Discovered Devices in NetBox
+
+**Browser:**
+- Open: http://192.168.1.120:8000
+- Navigate to: Devices → Devices
+- Verify routers appear
+
+</details>
+
+<details>
+<summary>SECTION 10: Monitoring Commands</summary>
+
+### Real-time Monitoring
+
+```bash
+# Watch ORB Agent discover devices
+docker logs -f orb-agent
+
+# Watch DIODE ingester receive data
+cd ~/netbox-discovery/diode
+docker compose logs -f diode-ingester
+
+# Watch DIODE reconciler push to NetBox
+docker compose logs -f diode-reconciler
+
+# Watch NetBox receive data
+cd ~/netbox-docker
+docker compose logs -f netbox
+```
+
+### Check Authentication
+
+```bash
+# Check Hydra OAuth clients
+cd ~/netbox-discovery/diode
+docker compose exec hydra hydra list clients --endpoint http://localhost:4445
+
+# Should show:
+# - diode-ingest
+# - diode-to-netbox
+# - netbox-to-diode
+# - orb-discovery-a-xxx
+```
+
+### Troubleshooting Commands
+
+```bash
+# Check if ORB can reach DIODE
+docker logs orb-agent | grep -i error
+docker logs orb-agent | grep -i "authentication"
+
+# Check if DIODE can reach NetBox
+cd ~/netbox-discovery/diode
+docker compose logs diode-reconciler | grep -i error
+docker compose logs diode-reconciler | grep -i timeout
+
+# Check NetBox plugin errors
+cd ~/netbox-docker
+docker compose logs netbox | grep -i error
 ```
 
 </details>
 
 <details>
-<summary>8. Startup Order</summary>
+<summary>Quick Reference - All Service Locations</summary>
 
 ```bash
-# Start services in this order:
-
-# 1. NetBox (First - Foundation)
+# NetBox
 cd ~/netbox-docker
-docker-compose up -d
-# Wait for NetBox to be healthy
-docker-compose ps
 
-# 2. DIODE Server (Second)
+# DIODE Server
 cd ~/netbox-discovery/diode
-docker-compose up -d
 
-# 3. ORB Agent (Last)
+# ORB Agent
 cd ~/netbox-discovery/orb-agent
-docker-compose up -d
+```
+
+</details>
+
+<details>
+<summary>Quick Start/Stop Commands</summary>
+
+```bash
+# Start all services
+cd ~/netbox-docker && docker compose up -d
+cd ~/netbox-discovery/diode && docker compose up -d
+cd ~/netbox-discovery/orb-agent && docker compose up -d
+
+# Stop all services
+cd ~/netbox-docker && docker compose down
+cd ~/netbox-discovery/diode && docker compose down
+cd ~/netbox-discovery/orb-agent && docker compose down
+
+# Restart all services
+cd ~/netbox-docker && docker compose restart
+cd ~/netbox-discovery/diode && docker compose restart
+cd ~/netbox-discovery/orb-agent && docker compose restart
+```
+
+</details>
+
+<details>
+<summary>Configuration Files Reference</summary>
+
+### DIODE OAuth Credentials
+```bash
+cat ~/netbox-discovery/diode/oauth2/client/client-credentials.json
+```
+
+### NetBox Plugin Config
+```bash
+cat ~/netbox-docker/configuration/plugins.py
+```
+
+### ORB Agent Config
+```bash
+cat ~/netbox-discovery/orb-agent/config.yaml
+```
+
+### DIODE .env (Reconciler credentials)
+```bash
+cat ~/netbox-discovery/diode/.env | grep DIODE_TO_NETBOX
+```
+
+</details>
+
+<details>
+<summary>Health Check Commands</summary>
+
+```bash
+# NetBox health
+curl http://192.168.1.120:8000/api/ -I
+
+# DIODE health
+curl http://192.168.1.120:8080/diode -I
+
+# Check all Docker containers
+docker ps -a
+
+# Check Docker resources
+docker system df
+```
+
+</details>
+
+<details>
+<summary>Complete Installation Checklist</summary>
+
+- [ ] Docker Compose v2 installed
+- [ ] Directory structure created
+- [ ] DIODE server running (7 containers)
+- [ ] NetBox plugin installed
+- [ ] NetBox using custom image
+- [ ] Plugin configured with OAuth credentials
+- [ ] NetBox showing DIODE menu
+- [ ] ORB Agent OAuth client created in NetBox UI
+- [ ] ORB Agent configured with credentials
+- [ ] ORB Agent discovering devices
+- [ ] DIODE receiving data
+- [ ] DIODE pushing to NetBox
+- [ ] Devices appearing in NetBox UI
+
+</details>
+
+<details>
+<summary>Expected Container Counts</summary>
+
+```bash
+# NetBox: 6 containers
+# - netbox
+# - netbox-worker
+# - postgres
+# - redis
+# - redis-cache
+# - (housekeeping - may be absent)
+
+# DIODE: 7 containers
+# - diode-ingester
+# - diode-reconciler
+# - diode-auth
+# - hydra
+# - postgres
+# - redis
+# - ingress-nginx
+
+# ORB Agent: 1 container
+# - orb-agent
+
+# Total: ~14 containers
+docker ps | wc -l
+```
+
+</details>
+
+<details>
+<summary>Port Reference</summary>
+
+```
+8000 - NetBox UI
+8080 - DIODE Server (gRPC)
+4444 - Hydra public (OAuth tokens)
+4445 - Hydra admin (OAuth introspection)
 ```
 
 </details>

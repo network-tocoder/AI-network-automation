@@ -338,6 +338,29 @@ ansible-playbook playbooks/fortigate_policy.yml --vault-password-file ~/.vault_p
 
 REST API automation with Postman and VS Code integration for firewall configurations.
 
+### 🎯 What You'll Learn
+
+- REST API automation with Postman
+- VS Code integration for API testing
+- CRUD operations (GET, POST, PUT, DELETE)
+
+### 📁 FortiGate API Structure
+
+```
+/api/v2/
+├── cmdb/      → Configuration (Create, Read, Update, Delete)
+├── monitor/   → Status & Monitoring (Read-only)
+└── log/       → Logs & Events (Read-only)
+```
+
+### 🔧 Postman Environment Variables
+
+| Variable | Value |
+|----------|-------|
+| `base_url` | `https://your-fortigate-ip` |
+| `api_token` | `your-api-token` |
+| `vdom` | `root` |
+
 ### 💻 Commands
 
 <details>
@@ -364,28 +387,130 @@ execute api-user generate-key api_user
 </details>
 
 <details>
-<summary>2. curl API Examples</summary>
+<summary>2. GET - System Status & Monitoring</summary>
 
 ```bash
 # Get system status
-curl -k -X GET "https://192.168.1.99/api/v2/monitor/system/status" \
+curl -k -X GET "https://192.168.1.99/api/v2/monitor/system/status?vdom=root" \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+
+# Get system interfaces
+curl -k -X GET "https://192.168.1.99/api/v2/cmdb/system/interface?vdom=root" \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+
+# Get firewall addresses
+curl -k -X GET "https://192.168.1.99/api/v2/cmdb/firewall/address?vdom=root" \
   -H "Authorization: Bearer YOUR_API_TOKEN"
 
 # Get firewall policies
-curl -k -X GET "https://192.168.1.99/api/v2/cmdb/firewall/policy" \
+curl -k -X GET "https://192.168.1.99/api/v2/cmdb/firewall/policy?vdom=root" \
   -H "Authorization: Bearer YOUR_API_TOKEN"
+```
 
-# Create firewall address object
-curl -k -X POST "https://192.168.1.99/api/v2/cmdb/firewall/address" \
+</details>
+
+<details>
+<summary>3. POST - Create Firewall Address Object</summary>
+
+```bash
+curl -k -X POST "https://192.168.1.99/api/v2/cmdb/firewall/address?vdom=root" \
   -H "Authorization: Bearer YOUR_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Test_Server",
-    "subnet": "10.0.0.10/32"
+    "name": "WebServer-1",
+    "type": "ipmask",
+    "subnet": "10.0.10.100 255.255.255.255",
+    "comment": "Web server created via API"
+  }'
+```
+
+**JSON Body Explained:**
+```json
+{
+  "name": "WebServer-1",
+  "type": "ipmask",
+  "subnet": "10.0.10.100 255.255.255.255",
+  "comment": "Web server created via API"
+}
+```
+
+</details>
+
+<details>
+<summary>4. POST - Create Firewall Policy</summary>
+
+```bash
+curl -k -X POST "https://192.168.1.99/api/v2/cmdb/firewall/policy?vdom=root" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Allow-Web-Traffic",
+    "srcintf": [{"name": "port1"}],
+    "dstintf": [{"name": "port2"}],
+    "srcaddr": [{"name": "all"}],
+    "dstaddr": [{"name": "WebServer-1"}],
+    "service": [{"name": "HTTP"}, {"name": "HTTPS"}],
+    "action": "accept",
+    "status": "enable"
   }'
 ```
 
 </details>
+
+<details>
+<summary>5. PUT - Update Interface</summary>
+
+```bash
+curl -k -X PUT "https://192.168.1.99/api/v2/cmdb/system/interface/port2?vdom=root" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "alias": "LAN-Internal",
+    "description": "Updated via API"
+  }'
+```
+
+</details>
+
+<details>
+<summary>6. DELETE - Remove Address Object</summary>
+
+```bash
+curl -k -X DELETE "https://192.168.1.99/api/v2/cmdb/firewall/address/WebServer-1?vdom=root" \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+</details>
+
+<details>
+<summary>7. Common API Endpoints Reference</summary>
+
+```bash
+# System Information
+/api/v2/monitor/system/status
+/api/v2/monitor/system/interface
+/api/v2/cmdb/system/global
+
+# Firewall
+/api/v2/cmdb/firewall/address
+/api/v2/cmdb/firewall/policy
+/api/v2/cmdb/firewall/service/custom
+
+# VPN
+/api/v2/cmdb/vpn.ssl.web/portal
+/api/v2/cmdb/vpn.ipsec/phase1-interface
+
+# Routing
+/api/v2/cmdb/router/static
+/api/v2/monitor/router/ipv4
+```
+
+</details>
+
+### 🔗 Resources
+
+- [FortiGate REST API Guide](https://docs.fortinet.com/document/fortigate/7.0.0/administration-guide/940602/rest-api)
+- [Postman Download](https://www.postman.com/downloads/)
 
 ---
 

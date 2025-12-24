@@ -1551,7 +1551,7 @@ cd netbox-discovery
 cd ~/netbox-discovery/diode
 
 # Download quickstart script
-curl -o diode-quickstart.sh https://raw.githubusercontent.com/netboxlabs/diode/main/diode-quickstart.sh
+curl -sSfLo quickstart.sh https://raw.githubusercontent.com/netboxlabs/diode/release/diode-server/docker/scripts/quickstart.sh
 
 # Make executable
 chmod +x diode-quickstart.sh

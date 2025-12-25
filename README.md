@@ -439,7 +439,7 @@ Add these lines at the end:
 </details>
 
 <details>
-<summary>5. ANSIBLE PROJECT STRUCTURE </summary>
+<summary>5. Ansible Project Structure </summary>
 
 ```bash
 #  ANSIBLE PROJECT STRUCTURE
@@ -497,7 +497,7 @@ ssh_args = -o ControlMaster=auto -o ControlPersist=60s -o StrictHostKeyChecking=
 </details>
 
 <details>
-<summary>6. ANSIBLE TESTING </summary>
+<summary>6. Ansible Testing  </summary>
 
 ```bash
 # Test connectivity

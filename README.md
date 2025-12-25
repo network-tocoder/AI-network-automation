@@ -1557,7 +1557,7 @@ curl -sSfLo quickstart.sh https://raw.githubusercontent.com/netboxlabs/diode/rel
 chmod +x quickstart.sh
 
 # Run script (replace IP with your NetBox IP)
-./quickstart.sh  http://192.168.0.20:8000 
+./quickstart.sh  http://192.168.1.20:8000 
 
 # Wait for completion...
 

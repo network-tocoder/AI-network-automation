@@ -494,7 +494,7 @@ become_method = enable
 ssh_args = -o ControlMaster=auto -o ControlPersist=60s -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
 ```
 
-<details>
+</details>
 
 <details>
 <summary>6. ANSIBLE TESTING </summary>
@@ -517,7 +517,7 @@ ansible routers -m ios_command -a "comands=show ip int brief ' "
 
 
 <details>
-<summary>8. Initialize Local Repository</summary>
+<summary>7. Initialize Local Repository</summary>
 
 ```bash
 # Navigate to your project
@@ -539,7 +539,7 @@ git commit -m "Initial commit: Ansible project structure"
 </details>
 
 <details>
-<summary>9. Connect to GitHub Repository</summary>
+<summary>8. Connect to GitHub Repository</summary>
 
 ```bash
 # Create repository on GitHub first, then:
@@ -557,7 +557,7 @@ git push -u origin main
 </details>
 
 <details>
-<summary>6. Daily Git Workflow</summary>
+<summary>9. Daily Git Workflow</summary>
 
 ```bash
 # Pull latest changes before starting work

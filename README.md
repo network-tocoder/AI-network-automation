@@ -353,6 +353,7 @@ Complete Git workflow for version controlling network automation projects with G
 - Git workflow: clone, branch, commit, push
 - VS Code Git integration
 
+
 ### 💻 Commands
 
 <details>
@@ -409,7 +410,7 @@ ssh -T git@github.com
 </details>
 
 <details>
-<summary>2B. Fixing SSH Issues (optional) & update DNS </summary>
+<summary>3. Fixing SSH Issues (optional) & update DNS </summary>
 
 ```bash
 # Test SSH access from Ansible Node - ssh ansible@192.168.1.101 (Incase issue - add this content)
@@ -419,9 +420,13 @@ Host vIOS-R*
  KexAlgorithms +diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1
  HostKeyAlgorithms +ssh-rsa
  StrictHostKeyChecking no
+```
+</details>
 
+<details>
+<summary>4. Update DNS entries </summary>
 
-
+```bash
 # Update DNS entries
 sudo vim /etc/hosts
 Add these lines at the end:
@@ -430,20 +435,11 @@ Add these lines at the end:
 192.168.1.11    vIOS-R2
 192.168.1.12    vIOS-R3
 
-# Check status
-git status
-
-# Add all files
-git add .
-
-# Create first commit
-git commit -m "Initial commit: Ansible project structure"
 ```
-
 </details>
 
 <details>
-<summary>3. ANSIBLE PROJECT STRUCTURE </summary>
+<summary>5. ANSIBLE PROJECT STRUCTURE </summary>
 
 ```bash
 #  ANSIBLE PROJECT STRUCTURE
@@ -454,8 +450,8 @@ mkdir -p playbooks group_vars host_vars device_configs
 touch inventory/hosts ansible.cfg
 
 touch playbooks/create_loopbacks.yml
-
-touch .gitignor
+```
+```bash
 
 # CONFIGURATION FILES
 inventory file:
@@ -496,18 +492,14 @@ become_method = enable
 
 [ssh_connection]
 ssh_args = -o ControlMaster=auto -o ControlPersist=60s -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+```
 
-.gitignore file: 
+<details>
 
-vim .gitignore
+<details>
+<summary>6. ANSIBLE TESTING </summary>
 
-# Check status
-git status
-
-# Add all files
-git add .
-
-# ANSIBLE TESTING
+```bash
 # Test connectivity
 ansible routers -m ping
 
@@ -521,12 +513,11 @@ ansible-playbook playbooks/create_loopbacks.yml
 ansible routers -m ios_command -a "comands=show ip int brief ' "
 
 ```
-
 </details>
 
 
 <details>
-<summary>3. Initialize Local Repository</summary>
+<summary>8. Initialize Local Repository</summary>
 
 ```bash
 # Navigate to your project
@@ -548,7 +539,7 @@ git commit -m "Initial commit: Ansible project structure"
 </details>
 
 <details>
-<summary>4. Connect to GitHub Repository</summary>
+<summary>9. Connect to GitHub Repository</summary>
 
 ```bash
 # Create repository on GitHub first, then:
@@ -566,7 +557,7 @@ git push -u origin main
 </details>
 
 <details>
-<summary>5. Daily Git Workflow</summary>
+<summary>6. Daily Git Workflow</summary>
 
 ```bash
 # Pull latest changes before starting work
@@ -598,7 +589,7 @@ git branch -d feature/new-playbook
 </details>
 
 <details>
-<summary>6. Useful Git Commands</summary>
+<summary>10. Useful Git Commands</summary>
 
 ```bash
 # View commit history
@@ -627,7 +618,7 @@ git branch -a
 </details>
 
 <details>
-<summary>7. .gitignore for Ansible Projects</summary>
+<summary>11. .gitignore for Ansible Projects</summary>
 
 ```bash
 # Create .gitignore
@@ -663,6 +654,7 @@ EOF
 ```
 
 </details>
+
 
 ### 🔗 Resources
 

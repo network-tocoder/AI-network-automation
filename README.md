@@ -409,7 +409,7 @@ ssh -T git@github.com
 </details>
 
 <details>
-<summary>3a. Fixing SSH Issues (optional) & update DNS </summary>
+<summary>2B. Fixing SSH Issues (optional) & update DNS </summary>
 
 ```bash
 # Test SSH access from Ansible Node - ssh ansible@192.168.1.101 (Incase issue - add this content)
@@ -441,6 +441,89 @@ git commit -m "Initial commit: Ansible project structure"
 ```
 
 </details>
+
+<details>
+<summary>3. ANSIBLE PROJECT STRUCTURE </summary>
+
+```bash
+#  ANSIBLE PROJECT STRUCTURE
+cd ~/ansible-project ( use alias - "netdev")
+
+mkdir -p playbooks group_vars host_vars device_configs 
+
+touch inventory/hosts ansible.cfg
+
+touch playbooks/create_loopbacks.yml
+
+touch .gitignor
+
+# CONFIGURATION FILES
+inventory file:
+
+vim inventory
+
+[routers]
+vIOS-R1 ansible_host=192.168.1.10
+vIOS-R2 ansible_host=192.168.1.11
+vIOS-R3 ansible_host=192.168.1.12
+
+[routers:vars]
+ansible_network_os=ios
+ansible_connection=network_cli
+ansible_user=ansible
+ansible_password=ansible@123
+ansible_become=yes
+ansible_become_method=enable
+ansible_become_password=ansible@123
+
+ansible.cfg file:
+
+vim ansible.cfg
+
+[defaults]
+inventory = inventory/hosts
+host_key_checking = False
+timeout = 30
+retry_files_enabled = False
+
+[persistent_connection]
+command_timeout = 30
+connect_timeout = 30
+
+[privilege_escalaation]
+become = True
+become_method = enable
+
+[ssh_connection]
+ssh_args = -o ControlMaster=auto -o ControlPersist=60s -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+
+.gitignore file: 
+
+vim .gitignore
+
+# Check status
+git status
+
+# Add all files
+git add .
+
+# ANSIBLE TESTING
+# Test connectivity
+ansible routers -m ping
+
+# Dry run
+ansible-playbook playbooks/create_loopbacks.yml - -syntax-check
+
+# Run playbook
+ansible-playbook playbooks/create_loopbacks.yml
+
+# Ansible Adhoc command
+ansible routers -m ios_command -a "comands=show ip int brief ' "
+
+```
+
+</details>
+
 
 <details>
 <summary>3. Initialize Local Repository</summary>

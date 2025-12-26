@@ -1,4 +1,3 @@
-<p align="center">
   <a href="https://git.io/typing-svg">
     <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=45&pause=1000&color=00E5FF&center=true&vCenter=true&width=1500&lines=Network+Automation+Series;Building+Intent-Based+Networks;AI-Powered+Networking+with+MCP" alt="Network Automation Series" />
   </a>
@@ -285,51 +284,24 @@ sudo apt install openssh-server -y
 sudo systemctl start ssh
 sudo systemctl enable ssh
 
+# Check SSH status
+sudo systemctl status ssh
+
+# Configure firewall (if enabled)
+sudo ufw allow ssh
+
 # Get IP address for VS Code connection
 ip addr show
-hostname -I
-
-# In VS Code:
-# 1. Install "Remote - SSH" extension
-# 2. Press F1 > "Remote-SSH: Connect to Host"
-# 3. Enter: root@<linux-node-ip>
-# 4. Select Linux platform
-# 5. Enter password when prompted
 ```
+
+**In VS Code:**
+1. Install "Remote - SSH" extension
+2. Press `F1` > "Remote-SSH: Connect to Host"
+3. Enter: `username@<linux-node-ip>`
+4. Open folder: `/home/username/`
+5. Install Python extension in remote environment
 
 </details>
-
-<details>
-<summary>6. Configure SSH for Root Login (if needed)</summary>
-
-```bash
-# Edit SSH config
-sudo nano /etc/ssh/sshd_config
-
-# Find and modify these lines:
-PermitRootLogin yes
-PasswordAuthentication yes
-
-# Restart SSH
-sudo systemctl restart ssh
-```
-
-</details>
-
-### 📁 Project Structure
-
-```
-~/ansible-project/
-├── ansible.cfg
-├── inventory/
-│   └── hosts
-├── group_vars/
-│   └── all/
-│       └── vault.yml
-├── playbooks/
-│   └── test.yml
-└── roles/
-```
 
 ### 🔗 Resources
 
@@ -344,34 +316,30 @@ sudo systemctl restart ssh
 
 ### 📋 Overview
 
-Complete Git workflow for version controlling network automation projects with GitHub integration.
+Complete Git workflow for network engineers - version control for Ansible projects.
 
 ### 🎯 What You'll Learn
 
-- Install and configure Git
-- Generate SSH keys for GitHub
-- Git workflow: clone, branch, commit, push
-- VS Code Git integration
-
+- Git fundamentals for network automation
+- Create GitHub repository
+- Push Ansible playbooks to GitHub
+- Best practices for version control
 
 ### 💻 Commands
 
 <details>
-<summary>1. Install & Configure Git</summary>
+<summary>1. Install Git</summary>
 
 ```bash
 # Install Git
 sudo apt install git -y
 
-# Configure Git identity
+# Verify installation
+git --version
+
+# Configure Git (use your details)
 git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
-
-# Configure default branch name
-git config --global init.defaultBranch main
-
-# Enable credential caching
-git config --global credential.helper cache
 
 # Verify configuration
 git config --list
@@ -380,286 +348,204 @@ git config --list
 </details>
 
 <details>
-<summary>2. Generate SSH Key for GitHub</summary>
+<summary>2. Initialize Local Repository</summary>
 
 ```bash
-# Generate ED25519 SSH key (recommended)
-ssh-keygen -t ed25519 -C "your.email@example.com"
-
-# Or RSA if ED25519 not supported
-ssh-keygen -t rsa -b 4096 -C "your.email@example.com"
-
-# Start SSH agent
-eval "$(ssh-agent -s)"
-
-# Add key to agent
-ssh-add ~/.ssh/id_ed25519
-
-# Display public key (copy this to GitHub)
-cat ~/.ssh/id_ed25519.pub
-
-# Add to GitHub:
-# GitHub > Settings > SSH and GPG keys > New SSH key
-# Paste the public key
-
-# Test GitHub connection
-ssh -T git@github.com
-# Expected: "Hi username! You've successfully authenticated..."
-```
-
-</details>
-
-<details>
-<summary>3. Fixing SSH Issues (optional) & update DNS </summary>
-
-```bash
-# Test SSH access from Ansible Node - ssh ansible@192.168.1.101 (Incase issue - add this content)
-vim ~/.ssh/config
-
-Host vIOS-R*
- KexAlgorithms +diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1
- HostKeyAlgorithms +ssh-rsa
- StrictHostKeyChecking no
-```
-</details>
-
-<details>
-<summary>4. Update DNS entries </summary>
-
-```bash
-# Update DNS entries
-sudo vim /etc/hosts
-Add these lines at the end:
-
-192.168.1.10    vIOS-R1
-192.168.1.11    vIOS-R2
-192.168.1.12    vIOS-R3
-
-```
-</details>
-
-<details>
-<summary>5. Ansible Project Structure </summary>
-
-```bash
-#  ANSIBLE PROJECT STRUCTURE
-cd ~/ansible-project ( use alias - "netdev")
-
-mkdir -p playbooks group_vars host_vars device_configs 
-
-touch inventory/hosts ansible.cfg
-
-touch playbooks/create_loopbacks.yml
-```
-```bash
-
-# CONFIGURATION FILES
-inventory file:
-
-vim inventory
-
-[routers]
-vIOS-R1 ansible_host=192.168.1.10
-vIOS-R2 ansible_host=192.168.1.11
-vIOS-R3 ansible_host=192.168.1.12
-
-[routers:vars]
-ansible_network_os=ios
-ansible_connection=network_cli
-ansible_user=ansible
-ansible_password=ansible@123
-ansible_become=yes
-ansible_become_method=enable
-ansible_become_password=ansible@123
-
-ansible.cfg file:
-
-vim ansible.cfg
-
-[defaults]
-inventory = inventory/hosts
-host_key_checking = False
-timeout = 30
-retry_files_enabled = False
-
-[persistent_connection]
-command_timeout = 30
-connect_timeout = 30
-
-[privilege_escalaation]
-become = True
-become_method = enable
-
-[ssh_connection]
-ssh_args = -o ControlMaster=auto -o ControlPersist=60s -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
-```
-
-</details>
-
-<details>
-<summary>6. Ansible Testing  </summary>
-
-```bash
-# Test connectivity
-ansible routers -m ping
-
-# Dry run
-ansible-playbook playbooks/create_loopbacks.yml - -syntax-check
-
-# Run playbook
-ansible-playbook playbooks/create_loopbacks.yml
-
-# Ansible Adhoc command
-ansible routers -m ios_command -a "comands=show ip int brief ' "
-
-```
-</details>
-
-
-<details>
-<summary>7. Initialize Local Repository</summary>
-
-```bash
-# Navigate to your project
-cd ~/ansible-project
+# Navigate to your project directory
+cd ~/ansible-projects
 
 # Initialize Git repository
 git init
 
-# Check status
+# Check repository status
 git status
 
-# Add all files
-git add .
+# Create .gitignore file
+cat << 'EOF' > .gitignore
+# Python
+__pycache__/
+*.py[cod]
+*.venv/
+venv/
 
-# Create first commit
-git commit -m "Initial commit: Ansible project structure"
+# Ansible
+*.retry
+*.log
+
+# Sensitive files
+inventory/hosts
+group_vars/vault.yml
+*vault*
+
+# IDE
+.vscode/
+.idea/
+EOF
+
+# View .gitignore
+cat .gitignore
 ```
 
 </details>
 
 <details>
-<summary>8. Connect to GitHub Repository</summary>
+<summary>3. Stage and Commit Files</summary>
 
 ```bash
-# Create repository on GitHub first, then:
+# Add all files to staging
+git add .
 
-# Add remote origin (SSH)
-git remote add origin git@github.com:username/repo-name.git
+# Or add specific files
+git add playbook.yml inventory/
+
+# Check staged files
+git status
+
+# Commit with message
+git commit -m "Initial commit: Ansible project structure"
+
+# View commit history
+git log
+git log --oneline
+```
+
+</details>
+
+<details>
+<summary>4. Create GitHub Repository</summary>
+
+```bash
+# On GitHub.com:
+# 1. Click "+" (top right) > "New repository"
+# 2. Repository name: ansible-network-automation
+# 3. Description: Network automation with Ansible
+# 4. Choose: Private or Public
+# 5. Do NOT initialize with README
+# 6. Click "Create repository"
+# 7. Copy the repository URL
+```
+
+</details>
+
+<details>
+<summary>5. Connect Local to GitHub</summary>
+
+```bash
+# Add remote repository (use HTTPS or SSH)
+git remote add origin https://github.com/yourusername/ansible-network-automation.git
 
 # Verify remote
 git remote -v
 
 # Push to GitHub
 git push -u origin main
+
+# Or if branch is named 'master'
+git branch -M main
+git push -u origin main
 ```
 
 </details>
 
 <details>
-<summary>9. Daily Git Workflow</summary>
+<summary>6. Daily Git Workflow</summary>
 
 ```bash
-# Pull latest changes before starting work
-git pull origin main
+# Check current status
+git status
 
-# Create feature branch
-git checkout -b feature/new-playbook
+# Pull latest changes (if working in team)
+git pull
 
-# Make your changes, then stage them
+# Make changes to your files...
+
+# Check what changed
+git diff
+
+# Stage changes
 git add .
 
-# Or stage specific files
-git add playbooks/new-playbook.yml
+# Commit changes
+git commit -m "Add VLAN configuration playbook"
 
-# Commit with descriptive message
-git commit -m "Add: FortiGate backup playbook"
+# Push to GitHub
+git push
 
-# Push feature branch
+# View commit history
+git log --oneline --graph
+```
+
+</details>
+
+<details>
+<summary>7. GitHub SSH Authentication (Recommended)</summary>
+
+```bash
+# Generate SSH key
+ssh-keygen -t ed25519 -C "your.email@example.com"
+# Press Enter for default location
+# Enter passphrase (optional)
+
+# Copy SSH public key
+cat ~/.ssh/id_ed25519.pub
+
+# On GitHub.com:
+# 1. Settings > SSH and GPG keys
+# 2. Click "New SSH key"
+# 3. Paste your public key
+# 4. Click "Add SSH key"
+
+# Test SSH connection
+ssh -T git@github.com
+
+# Change remote to SSH
+git remote set-url origin git@github.com:yourusername/ansible-network-automation.git
+
+# Verify
+git remote -v
+```
+
+</details>
+
+<details>
+<summary>8. Branching Strategy</summary>
+
+```bash
+# Create new branch
+git branch feature/new-playbook
+
+# Switch to branch
+git checkout feature/new-playbook
+
+# Or create and switch in one command
+git checkout -b feature/new-playbook
+
+# List all branches
+git branch
+
+# Make changes and commit
+git add .
+git commit -m "Add new feature"
+
+# Push branch to GitHub
 git push origin feature/new-playbook
 
-# After PR is merged, switch back to main
+# Switch back to main
 git checkout main
-git pull origin main
 
-# Delete local feature branch
+# Merge branch
+git merge feature/new-playbook
+
+# Delete branch
 git branch -d feature/new-playbook
 ```
 
 </details>
 
-<details>
-<summary>10. Useful Git Commands</summary>
-
-```bash
-# View commit history
-git log --oneline
-
-# View changes before staging
-git diff
-
-# View staged changes
-git diff --staged
-
-# Undo last commit (keep changes)
-git reset --soft HEAD~1
-
-# Discard local changes
-git checkout -- filename
-
-# Stash changes temporarily
-git stash
-git stash pop
-
-# View all branches
-git branch -a
-```
-
-</details>
-
-<details>
-<summary>11. .gitignore for Ansible Projects</summary>
-
-```bash
-# Create .gitignore
-cat << 'EOF' > .gitignore
-# Ansible
-*.retry
-*.pyc
-__pycache__/
-
-# Vault password files
-.vault_pass
-vault_password_file
-
-# Environment files
-.env
-*.env
-
-# IDE
-.vscode/
-.idea/
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-
-# Temporary files
-*.tmp
-*.swp
-EOF
-```
-
-</details>
-
-
 ### 🔗 Resources
 
-- [GitHub SSH Documentation](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
-- [Git Cheat Sheet](https://education.github.com/git-cheat-sheet-education.pdf)
+- [Git Documentation](https://git-scm.com/doc)
+- [GitHub Guides](https://guides.github.com/)
 
 ---
 
@@ -669,87 +555,83 @@ EOF
 
 ### 📋 Overview
 
-FortiGate installation in virtual lab and network security device configuration.
+Deploy FortiGate virtual firewall in EVE-NG for security automation testing.
 
 ### 🎯 What You'll Learn
 
-- Add FortiGate image to EVE-NG
+- Download FortiGate VM image
+- Add FortiGate to EVE-NG
 - Initial FortiGate configuration
-- Enable management access
-- Enable REST API
+- Network connectivity setup
 
 ### 💻 Commands
 
 <details>
-<summary>1. Add FortiGate Image to EVE-NG</summary>
+<summary>1. Download FortiGate VM Image</summary>
 
 ```bash
-# On EVE-NG server
-# Create directory for FortiGate
-mkdir -p /opt/unetlab/addons/qemu/fortinet-FGT-v7.2.12
+# Visit: https://support.fortinet.com/
+# Login with account (free trial available)
+# Download: FortiGate-VM64-KVM (QCOW2 format)
+# Version: Latest 7.x
 
-# Upload FortiGate image via WinSCP/SCP
-
-# Navigate to directory
-cd /opt/unetlab/addons/qemu/fortinet-FGT-v7.2.12
-
-# Unzip image
-unzip FGT_VM64_KVM-v7.2.12.zip
-
-# Rename to virtioa.qcow2
-mv fortios.qcow2 virtioa.qcow2
-
-# Fix permissions
-/opt/unetlab/wrappers/unl_wrapper -a fixpermissions
-
-# Verify
-ls -la 
+# On your computer, upload to EVE-NG via SCP
+scp FGT_VM64_KVM-v7.x.x-build.out root@<eve-ng-ip>:/tmp/
 ```
 
 </details>
 
 <details>
-<summary>2. FortiGate Initial CLI Setup</summary>
+<summary>2. Install FortiGate in EVE-NG</summary>
+
+```bash
+# On EVE-NG server
+cd /tmp
+
+# Create FortiGate directory
+mkdir -p /opt/unetlab/addons/qemu/fortigate-7.4.1
+
+# Rename image
+mv FGT_VM64_KVM-v7-build*.out /opt/unetlab/addons/qemu/fortigate-7.4.1/hda.qcow2
+
+# Fix permissions
+/opt/unetlab/wrappers/unl_wrapper -a fixpermissions
+
+# Verify installation
+ls -la /opt/unetlab/addons/qemu/fortigate-7.4.1/
+```
+
+</details>
+
+<details>
+<summary>3. FortiGate Initial Configuration</summary>
 
 ```bash
 # Default credentials
 # Username: admin
 # Password: (blank - press Enter)
 
-# Show system status
-get system status
+# Initial setup via console
+# Set admin password
+config system admin
+    edit admin
+        set password YourStrongPassword
+    end
 
-# Show interface status
-get system interface physical
-```
+# Configure hostname
+config system global
+    set hostname FortiGate-VM
+end
 
-</details>
-
-<details>
-<summary>3. Configure Management Interface</summary>
-
-```bash
-# Configure port1 for management
+# Configure management interface
 config system interface
     edit port1
         set mode static
         set ip 192.168.1.99/24
-        set allowaccess ping https ssh http fgfm
-        set alias "Management"
-    next
-end
+        set allowaccess ping https ssh http
+    end
 
-# Verify interface
-show system interface port1
-```
-
-</details>
-
-<details>
-<summary>4. Configure Default Gateway</summary>
-
-```bash
-# Set default route
+# Configure default gateway
 config router static
     edit 1
         set gateway 192.168.1.1
@@ -757,57 +639,43 @@ config router static
     next
 end
 
-# Verify routing
-get router info routing-table all
-```
-
-</details>
-
-<details>
-<summary>5. Enable REST API Access</summary>
-
-```bash
-# Create API admin user
-config system api-user
-    edit "api_admin"
-        set accprofile "super_admin"
-        set vdom "root"
-        config trusthost
-            edit 1
-                set ipv4-trusthost 192.168.1.0/24
-            next
-        end
-    next
+# Configure DNS
+config system dns
+    set primary 8.8.8.8
+    set secondary 8.8.4.4
 end
 
-# Generate API token
-execute api-user generate-key api_admin
-
-# Save the token! It won't be shown again
+# Save configuration
+execute save config
 ```
 
 </details>
 
 <details>
-<summary>6. Verify Configuration</summary>
+<summary>4. Verify Connectivity</summary>
 
 ```bash
-# Test from Linux node
-ping 192.168.1.99 -c 4
+# Check interface status
+get system interface physical
 
-# Test HTTPS access
-curl -k https://192.168.1.99
+# Test ping
+execute ping 8.8.8.8
 
-# Test API access
-curl -k -X GET "https://192.168.1.99/api/v2/monitor/system/status" \
-  -H "Authorization: Bearer YOUR_API_TOKEN"
+# Check routes
+get router info routing-table all
+
+# Access via GUI
+# https://192.168.1.99
+# Username: admin
+# Password: YourStrongPassword
 ```
 
 </details>
 
 ### 🔗 Resources
 
-- [FortiGate Administration Guide](https://docs.fortinet.com/document/fortigate/7.0.0/administration-guide)
+- [FortiGate Documentation](https://docs.fortinet.com/)
+- [FortiGate Cookbook](https://docs.fortinet.com/product/fortigate)
 
 ---
 
@@ -817,238 +685,282 @@ curl -k -X GET "https://192.168.1.99/api/v2/monitor/system/status" \
 
 ### 📋 Overview
 
-Install Ansible Collections for FortiGate, configure Ansible Vault, and run automation playbooks.
+Automate FortiGate firewall configuration using Ansible with secure credential management.
 
 ### 🎯 What You'll Learn
 
-- Install FortiGate Ansible Collection
-- Understand Ansible Galaxy and Collections
-- Secure credentials with Ansible Vault
-- Create and run FortiGate playbooks
+- Install FortiOS Ansible collection
+- Create inventory for FortiGate
+- Use Ansible Vault for credentials
+- Write FortiGate automation playbooks
 
 ### 💻 Commands
 
 <details>
-<summary>1. Install FortiGate Ansible Collection</summary>
+<summary>1. Install FortiOS Ansible Collection</summary>
 
 ```bash
 # Activate virtual environment
 source ~/ansible-venv/bin/activate
 
-# Install FortiOS collection from Ansible Galaxy
+# Install FortiOS collection
 ansible-galaxy collection install fortinet.fortios
 
 # Verify installation
 ansible-galaxy collection list | grep fortinet
-
-# View collection documentation
-ansible-doc -l | grep fortios
 ```
 
 </details>
 
 <details>
-<summary>2. Project Directory Structure</summary>
+<summary>2. Create Project Structure</summary>
 
 ```bash
-# Create project structure
-mkdir -p ~/ansible-project/{inventory,group_vars/fortigates,playbooks}
-cd ~/ansible-project
+# Create project directory
+mkdir -p ~/ansible-projects/fortigate-automation
+cd ~/ansible-projects/fortigate-automation
 
-# Create structure
-tree ~/ansible-project/
-# ansible-project/
-# ├── ansible.cfg
-# ├── inventory/
-# │   └── hosts
-# ├── group_vars/
-# │   ├── all/
-# │   │   └── vault.yml
-# │   └── fortigates/
-# │       └── vars.yml
-# └── playbooks/
-#     ├── fortigate_info.yml
-#     └── fortigate_policy.yml
-```
+# Create directory structure
+mkdir -p {inventory,group_vars,playbooks,roles}
 
-</details>
-
-<details>
-<summary>3. Create ansible.cfg</summary>
-
-```bash
-cat << 'EOF' > ~/ansible-project/ansible.cfg
-[defaults]
-inventory = inventory/hosts
-host_key_checking = False
-timeout = 30
-retry_files_enabled = False
-gathering = explicit
-stdout_callback = yaml
-
-[privilege_escalation]
-become = True
-become_method = enable
-EOF
-```
-
-</details>
-
-<details>
-<summary>4. Create Inventory File</summary>
-
-```bash
-cat << 'EOF' > ~/ansible-project/inventory/hosts
-[routers]
-vIOS-R1 ansible_host=192.168.1.101
-vIOS-R2 ansible_host=192.168.1.102
-vIOS-R3 ansible_host=192.168.1.103
-
-[routers:vars]
-ansible_network_os=ios
-ansible_connection=network_cli
-ansible_user=ansible
-ansible_password=ansible@123
-ansible_become=yes
-ansible_become_method=enable
-
+# Create inventory file
+cat << 'EOF' > inventory/hosts
 [fortigates]
-fw01 ansible_host=192.168.1.99
+fortigate-vm ansible_host=192.168.1.99
 
 [fortigates:vars]
-ansible_network_os=fortinet.fortios.fortios
 ansible_connection=httpapi
+ansible_network_os=fortinet.fortios.fortios
 ansible_httpapi_use_ssl=yes
 ansible_httpapi_validate_certs=no
 ansible_httpapi_port=443
 EOF
+
+# View inventory
+cat inventory/hosts
 ```
 
 </details>
 
 <details>
-<summary>5. Setup Ansible Vault for Credentials</summary>
+<summary>3. Secure Credentials with Ansible Vault</summary>
 
 ```bash
 # Create vault password file
-echo "YourSecureVaultPassword" > ~/.vault_pass
-chmod 600 ~/.vault_pass
+echo "YourVaultPassword" > .vault_pass
+
+# Secure the password file
+chmod 600 .vault_pass
+
+# Add to .gitignore
+echo ".vault_pass" >> .gitignore
 
 # Create encrypted vault file
-ansible-vault create group_vars/fortigates/vault.yml --vault-password-file ~/.vault_pass
+ansible-vault create group_vars/fortigates/vault.yml --vault-password-file .vault_pass
 
-# Add these contents:
-# vault_fortios_api_token: "your-api-token-here"
-# vault_fortios_user: "admin"
-# vault_fortios_password: "your-password"
+# Inside vault.yml, add:
+---
+vault_fortigate_username: admin
+vault_fortigate_password: YourFortiGatePassword
 
-# Edit vault file later
-ansible-vault edit group_vars/fortigates/vault.yml --vault-password-file ~/.vault_pass
+# Save and exit (ESC :wq)
 
-# View vault file (decrypted)
-ansible-vault view group_vars/fortigates/vault.yml --vault-password-file ~/.vault_pass
+# Verify vault is encrypted
+cat group_vars/fortigates/vault.yml
+
+# Edit vault later
+ansible-vault edit group_vars/fortigates/vault.yml --vault-password-file .vault_pass
+
+# View vault content
+ansible-vault view group_vars/fortigates/vault.yml --vault-password-file .vault_pass
 ```
 
 </details>
 
 <details>
-<summary>6. Create System Info Playbook</summary>
+<summary>4. Create Variables File</summary>
 
-```yaml
-# playbooks/fortigate_info.yml
+```bash
+# Create non-sensitive variables
+cat << 'EOF' > group_vars/fortigates/vars.yml
 ---
-- name: Get FortiGate System Information
+ansible_user: "{{ vault_fortigate_username }}"
+ansible_password: "{{ vault_fortigate_password }}"
+EOF
+
+# View variables
+cat group_vars/fortigates/vars.yml
+```
+
+</details>
+
+<details>
+<summary>5. Test Connectivity</summary>
+
+```bash
+# Create test playbook
+cat << 'EOF' > playbooks/test_connection.yml
+---
+- name: Test FortiGate Connection
   hosts: fortigates
   gather_facts: no
-  vars_files:
-    - ../group_vars/fortigates/vault.yml
   
   tasks:
     - name: Get system status
-      fortinet.fortios.fortios_monitor_fact:
-        access_token: "{{ vault_fortios_api_token }}"
-        vdom: "root"
-        selector: system_status
+      fortinet.fortios.fortios_system_status:
+        vdom: root
       register: system_status
-
-    - name: Display system information
+      
+    - name: Display FortiGate info
       debug:
-        var: system_status.meta.results
+        msg: 
+          - "Hostname: {{ system_status.meta.results.hostname }}"
+          - "Version: {{ system_status.meta.results.version }}"
+          - "Serial: {{ system_status.meta.results.serial }}"
+EOF
+
+# Run test playbook
+ansible-playbook -i inventory/hosts playbooks/test_connection.yml --vault-password-file .vault_pass
 ```
 
 </details>
 
 <details>
-<summary>7. Create Firewall Policy Playbook</summary>
+<summary>6. Configure Firewall Address Objects</summary>
 
-```yaml
-# playbooks/fortigate_policy.yml
+```bash
+# Create address objects playbook
+cat << 'EOF' > playbooks/create_address_objects.yml
 ---
-- name: Create FortiGate Firewall Policy
+- name: Configure FortiGate Address Objects
   hosts: fortigates
   gather_facts: no
-  vars_files:
-    - ../group_vars/fortigates/vault.yml
   
   tasks:
-    - name: Create address object
+    - name: Create Server-Web address
       fortinet.fortios.fortios_firewall_address:
-        access_token: "{{ vault_fortios_api_token }}"
-        vdom: "root"
+        vdom: root
         state: present
         firewall_address:
-          name: "WebServer-Ansible"
+          name: "Server-Web"
           type: "ipmask"
-          subnet: "10.0.10.100 255.255.255.255"
-          comment: "Created by Ansible"
+          subnet: "10.0.1.10/32"
+          comment: "Web Server"
+      
+    - name: Create Server-DB address
+      fortinet.fortios.fortios_firewall_address:
+        vdom: root
+        state: present
+        firewall_address:
+          name: "Server-DB"
+          type: "ipmask"
+          subnet: "10.0.2.10/32"
+          comment: "Database Server"
+      
+    - name: Create Network-LAN address
+      fortinet.fortios.fortios_firewall_address:
+        vdom: root
+        state: present
+        firewall_address:
+          name: "Network-LAN"
+          type: "ipmask"
+          subnet: "192.168.1.0/24"
+          comment: "Internal LAN"
+EOF
 
-    - name: Create firewall policy
+# Run playbook
+ansible-playbook -i inventory/hosts playbooks/create_address_objects.yml --vault-password-file .vault_pass
+```
+
+</details>
+
+<details>
+<summary>7. Configure Firewall Policies</summary>
+
+```bash
+# Create firewall policy playbook
+cat << 'EOF' > playbooks/create_firewall_policy.yml
+---
+- name: Configure FortiGate Firewall Policies
+  hosts: fortigates
+  gather_facts: no
+  
+  tasks:
+    - name: Allow LAN to Web Server
       fortinet.fortios.fortios_firewall_policy:
-        access_token: "{{ vault_fortios_api_token }}"
-        vdom: "root"
+        vdom: root
         state: present
         firewall_policy:
-          policyid: 100
-          name: "Ansible-Web-Policy"
+          policyid: 10
+          name: "Allow-LAN-to-Web"
+          action: "accept"
           srcintf:
-            - name: "port1"
-          dstintf:
             - name: "port2"
+          dstintf:
+            - name: "port3"
           srcaddr:
-            - name: "all"
+            - name: "Network-LAN"
           dstaddr:
-            - name: "WebServer-Ansible"
+            - name: "Server-Web"
           service:
             - name: "HTTP"
             - name: "HTTPS"
-          action: "accept"
-          status: "enable"
+          schedule: "always"
+          nat: "disable"
           logtraffic: "all"
-          comments: "Created by Ansible automation"
+          comments: "Allow LAN to Web Server"
+EOF
+
+# Run playbook
+ansible-playbook -i inventory/hosts playbooks/create_firewall_policy.yml --vault-password-file .vault_pass
 ```
 
 </details>
 
 <details>
-<summary>8. Run Playbooks</summary>
+<summary>8. Backup FortiGate Configuration</summary>
 
 ```bash
-# Run system info playbook
-ansible-playbook playbooks/fortigate_info.yml --vault-password-file ~/.vault_pass
+# Create backup playbook
+cat << 'EOF' > playbooks/backup_config.yml
+---
+- name: Backup FortiGate Configuration
+  hosts: fortigates
+  gather_facts: no
+  
+  tasks:
+    - name: Backup configuration
+      fortinet.fortios.fortios_monitor:
+        vdom: root
+        selector: "system_config_backup"
+        params:
+          scope: "global"
+      register: backup
+      
+    - name: Save backup to file
+      copy:
+        content: "{{ backup.meta }}"
+        dest: "./backups/{{ inventory_hostname }}_{{ ansible_date_time.date }}.conf"
+      delegate_to: localhost
+      
+    - name: Display backup location
+      debug:
+        msg: "Backup saved to: ./backups/{{ inventory_hostname }}_{{ ansible_date_time.date }}.conf"
+EOF
 
-# Run policy playbook
-ansible-playbook playbooks/fortigate_policy.yml --vault-password-file ~/.vault_pass
+# Create backup directory
+mkdir -p backups
 
-# Run with verbose output
-ansible-playbook playbooks/fortigate_info.yml --vault-password-file ~/.vault_pass -vvv
+# Run backup playbook
+ansible-playbook -i inventory/hosts playbooks/backup_config.yml --vault-password-file .vault_pass
 ```
 
 </details>
 
 ### 🔗 Resources
 
-- [Fortinet Ansible Collection](https://galaxy.ansible.com/fortinet/fortios)
-- [FortiOS Ansible Modules Documentation](https://ansible-galaxy-fortios-docs.readthedocs.io/)
+- [FortiOS Ansible Collection](https://galaxy.ansible.com/fortinet/fortios)
+- [Ansible Vault Documentation](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
 
 ---
 
@@ -1058,220 +970,281 @@ ansible-playbook playbooks/fortigate_info.yml --vault-password-file ~/.vault_pas
 
 ### 📋 Overview
 
-REST API automation with Postman and VS Code integration for firewall configurations.
+Automate FortiGate using REST API with Postman and VS Code.
 
 ### 🎯 What You'll Learn
 
-- Understand FortiGate REST API structure
-- Use Postman for API testing
-- CRUD operations with curl
-- Create, update, and delete firewall objects
-
-### 📁 FortiGate API Structure
-
-```
-/api/v2/
-├── cmdb/      → Configuration (Create, Read, Update, Delete)
-│   ├── firewall/address
-│   ├── firewall/policy
-│   ├── system/interface
-│   └── router/static
-├── monitor/   → Status & Monitoring (Read-only)
-│   ├── system/status
-│   ├── system/interface
-│   └── router/ipv4
-└── log/       → Logs & Events (Read-only)
-```
-
-### 🔧 Postman Environment Variables
-
-| Variable | Value |
-|----------|-------|
-| `base_url` | `https://192.168.1.99` |
-| `api_token` | `your-api-token` |
-| `vdom` | `root` |
+- FortiGate REST API fundamentals
+- Test APIs with Postman
+- Python automation with requests library
+- GitHub workflow integration
 
 ### 💻 Commands
 
 <details>
-<summary>1. Generate API Token on FortiGate</summary>
+<summary>1. Enable FortiGate API Access</summary>
 
 ```bash
-# FortiGate CLI: Create API admin user
+# On FortiGate CLI or GUI
+# CLI method:
 config system api-user
-    edit "api_user"
-        set accprofile "super_admin"
-        set vdom "root"
-        config trusthost
-            edit 1
-                set ipv4-trusthost 192.168.1.0/24
-            next
-        end
+    edit api-admin
+        set accprofile super_admin
+        set vdom root
+        set api-key YourAPIKeyHere
+        set comments "API access for automation"
     next
 end
 
-# Generate API token
-execute api-user generate-key api_user
-
-# IMPORTANT: Save this token immediately!
-# Example: rdQH8FxsrN8y9G5dhHk4gf1qpjen0z
+# Or via GUI:
+# System > Administrators > Create New > REST API Admin
+# Profile: super_admin
+# Trusted Hosts: 0.0.0.0/0 (for testing - restrict in production)
+# Copy the API key!
 ```
 
 </details>
 
 <details>
-<summary>2. GET - System Status & Monitoring</summary>
+<summary>2. Test API with cURL</summary>
 
 ```bash
-# Get system status
-curl -k -X GET "https://192.168.1.99/api/v2/monitor/system/status?vdom=root" \
-  -H "Authorization: Bearer YOUR_API_TOKEN"
+# Set variables
+FORTIGATE_IP="192.168.1.99"
+API_KEY="YourAPIKeyHere"
 
-# Get system interfaces
-curl -k -X GET "https://192.168.1.99/api/v2/cmdb/system/interface?vdom=root" \
-  -H "Authorization: Bearer YOUR_API_TOKEN"
+# Get system status
+curl -k -X GET "https://${FORTIGATE_IP}/api/v2/monitor/system/status" \
+  -H "Authorization: Bearer ${API_KEY}"
 
 # Get firewall addresses
-curl -k -X GET "https://192.168.1.99/api/v2/cmdb/firewall/address?vdom=root" \
-  -H "Authorization: Bearer YOUR_API_TOKEN"
+curl -k -X GET "https://${FORTIGATE_IP}/api/v2/cmdb/firewall/address" \
+  -H "Authorization: Bearer ${API_KEY}"
 
 # Get firewall policies
-curl -k -X GET "https://192.168.1.99/api/v2/cmdb/firewall/policy?vdom=root" \
-  -H "Authorization: Bearer YOUR_API_TOKEN"
-
-# Get specific address object
-curl -k -X GET "https://192.168.1.99/api/v2/cmdb/firewall/address/WebServer-1?vdom=root" \
-  -H "Authorization: Bearer YOUR_API_TOKEN"
+curl -k -X GET "https://${FORTIGATE_IP}/api/v2/cmdb/firewall/policy" \
+  -H "Authorization: Bearer ${API_KEY}"
 ```
 
 </details>
 
 <details>
-<summary>3. POST - Create Firewall Address Object</summary>
+<summary>3. Install Postman</summary>
 
 ```bash
-curl -k -X POST "https://192.168.1.99/api/v2/cmdb/firewall/address?vdom=root" \
-  -H "Authorization: Bearer YOUR_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "WebServer-API",
-    "type": "ipmask",
-    "subnet": "10.0.10.100 255.255.255.255",
-    "comment": "Created via REST API"
-  }'
+# Download Postman from: https://www.postman.com/downloads/
 
-# Create subnet address
-curl -k -X POST "https://192.168.1.99/api/v2/cmdb/firewall/address?vdom=root" \
-  -H "Authorization: Bearer YOUR_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Internal-Network",
-    "type": "ipmask",
-    "subnet": "10.0.0.0 255.255.255.0",
-    "comment": "Internal LAN subnet"
-  }'
+# Or install via snap (Linux)
+sudo snap install postman
+
+# Launch Postman
+postman
+```
+
+**Postman Collection Setup:**
+1. Create new collection: "FortiGate API"
+2. Add environment variable: `base_url` = `https://192.168.1.99`
+3. Add environment variable: `api_key` = `YourAPIKeyHere`
+4. Set Authorization: Bearer Token = `{{api_key}}`
+
+</details>
+
+<details>
+<summary>4. Python REST API Script</summary>
+
+```bash
+# Create Python script
+cat << 'EOF' > fortigate_api.py
+#!/usr/bin/env python3
+import requests
+import json
+from urllib3.exceptions import InsecureRequestWarning
+
+# Disable SSL warnings for self-signed certs
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
+class FortiGateAPI:
+    def __init__(self, host, api_key):
+        self.host = host
+        self.api_key = api_key
+        self.base_url = f"https://{host}/api/v2"
+        self.headers = {"Authorization": f"Bearer {api_key}"}
+    
+    def get_system_status(self):
+        """Get FortiGate system status"""
+        url = f"{self.base_url}/monitor/system/status"
+        response = requests.get(url, headers=self.headers, verify=False)
+        return response.json()
+    
+    def get_firewall_addresses(self):
+        """Get all firewall address objects"""
+        url = f"{self.base_url}/cmdb/firewall/address"
+        response = requests.get(url, headers=self.headers, verify=False)
+        return response.json()
+    
+    def create_firewall_address(self, name, subnet, comment=""):
+        """Create firewall address object"""
+        url = f"{self.base_url}/cmdb/firewall/address"
+        data = {
+            "name": name,
+            "type": "ipmask",
+            "subnet": subnet,
+            "comment": comment
+        }
+        response = requests.post(url, headers=self.headers, 
+                               json=data, verify=False)
+        return response.json()
+    
+    def delete_firewall_address(self, name):
+        """Delete firewall address object"""
+        url = f"{self.base_url}/cmdb/firewall/address/{name}"
+        response = requests.delete(url, headers=self.headers, verify=False)
+        return response.json()
+
+# Example usage
+if __name__ == "__main__":
+    # Configuration
+    FORTIGATE_HOST = "192.168.1.99"
+    API_KEY = "YourAPIKeyHere"
+    
+    # Create API instance
+    fg = FortiGateAPI(FORTIGATE_HOST, API_KEY)
+    
+    # Get system status
+    print("=== System Status ===")
+    status = fg.get_system_status()
+    print(json.dumps(status, indent=2))
+    
+    # Create address object
+    print("\n=== Creating Address Object ===")
+    result = fg.create_firewall_address(
+        name="Test-Server",
+        subnet="10.10.10.10/32",
+        comment="Created via API"
+    )
+    print(json.dumps(result, indent=2))
+    
+    # Get all addresses
+    print("\n=== All Address Objects ===")
+    addresses = fg.get_firewall_addresses()
+    print(json.dumps(addresses, indent=2))
+EOF
+
+# Make executable
+chmod +x fortigate_api.py
+
+# Run script
+python3 fortigate_api.py
 ```
 
 </details>
 
 <details>
-<summary>4. POST - Create Firewall Policy</summary>
+<summary>5. Install Required Python Libraries</summary>
 
 ```bash
-curl -k -X POST "https://192.168.1.99/api/v2/cmdb/firewall/policy?vdom=root" \
-  -H "Authorization: Bearer YOUR_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Allow-Web-Traffic-API",
-    "srcintf": [{"name": "port1"}],
-    "dstintf": [{"name": "port2"}],
-    "srcaddr": [{"name": "all"}],
-    "dstaddr": [{"name": "WebServer-API"}],
-    "service": [{"name": "HTTP"}, {"name": "HTTPS"}],
-    "action": "accept",
-    "status": "enable",
-    "logtraffic": "all",
-    "comments": "Created via REST API"
-  }'
+# Activate virtual environment
+source ~/ansible-venv/bin/activate
+
+# Install requests library
+pip install requests urllib3
+
+# Create requirements.txt
+cat << 'EOF' > requirements.txt
+requests>=2.28.0
+urllib3>=1.26.0
+EOF
+
+# Install from requirements
+pip install -r requirements.txt
 ```
 
 </details>
 
 <details>
-<summary>5. PUT - Update Existing Object</summary>
+<summary>6. Advanced API Operations</summary>
 
 ```bash
-# Update interface alias
-curl -k -X PUT "https://192.168.1.99/api/v2/cmdb/system/interface/port2?vdom=root" \
-  -H "Authorization: Bearer YOUR_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "alias": "LAN-Internal",
-    "description": "Updated via API"
-  }'
+# Create advanced API script
+cat << 'EOF' > fortigate_bulk_operations.py
+#!/usr/bin/env python3
+import requests
+import json
+from urllib3.exceptions import InsecureRequestWarning
 
-# Update address object
-curl -k -X PUT "https://192.168.1.99/api/v2/cmdb/firewall/address/WebServer-API?vdom=root" \
-  -H "Authorization: Bearer YOUR_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "comment": "Updated comment via API"
-  }'
-```
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
-</details>
+class FortiGateAPI:
+    def __init__(self, host, api_key):
+        self.host = host
+        self.api_key = api_key
+        self.base_url = f"https://{host}/api/v2"
+        self.headers = {"Authorization": f"Bearer {api_key}"}
+    
+    def bulk_create_addresses(self, address_list):
+        """Create multiple address objects"""
+        results = []
+        for addr in address_list:
+            url = f"{self.base_url}/cmdb/firewall/address"
+            response = requests.post(url, headers=self.headers, 
+                                   json=addr, verify=False)
+            results.append({
+                "name": addr["name"],
+                "status": response.status_code,
+                "result": response.json()
+            })
+        return results
+    
+    def get_firewall_policies(self):
+        """Get all firewall policies"""
+        url = f"{self.base_url}/cmdb/firewall/policy"
+        response = requests.get(url, headers=self.headers, verify=False)
+        return response.json()
+    
+    def backup_configuration(self):
+        """Backup full configuration"""
+        url = f"{self.base_url}/monitor/system/config/backup"
+        response = requests.get(url, headers=self.headers, verify=False)
+        return response.content
 
-<details>
-<summary>6. DELETE - Remove Objects</summary>
+# Example: Bulk create address objects
+if __name__ == "__main__":
+    FORTIGATE_HOST = "192.168.1.99"
+    API_KEY = "YourAPIKeyHere"
+    
+    fg = FortiGateAPI(FORTIGATE_HOST, API_KEY)
+    
+    # Define addresses to create
+    addresses = [
+        {"name": "Server-Web-01", "type": "ipmask", "subnet": "10.0.1.10/32"},
+        {"name": "Server-Web-02", "type": "ipmask", "subnet": "10.0.1.11/32"},
+        {"name": "Server-DB-01", "type": "ipmask", "subnet": "10.0.2.10/32"},
+        {"name": "Server-DB-02", "type": "ipmask", "subnet": "10.0.2.11/32"}
+    ]
+    
+    # Bulk create
+    print("Creating address objects...")
+    results = fg.bulk_create_addresses(addresses)
+    print(json.dumps(results, indent=2))
+    
+    # Backup configuration
+    print("\nBacking up configuration...")
+    backup = fg.backup_configuration()
+    with open("fortigate_backup.conf", "wb") as f:
+        f.write(backup)
+    print("Backup saved to: fortigate_backup.conf")
+EOF
 
-```bash
-# Delete address object
-curl -k -X DELETE "https://192.168.1.99/api/v2/cmdb/firewall/address/WebServer-API?vdom=root" \
-  -H "Authorization: Bearer YOUR_API_TOKEN"
-
-# Delete firewall policy by ID
-curl -k -X DELETE "https://192.168.1.99/api/v2/cmdb/firewall/policy/100?vdom=root" \
-  -H "Authorization: Bearer YOUR_API_TOKEN"
-```
-
-</details>
-
-<details>
-<summary>7. Common API Endpoints Reference</summary>
-
-```bash
-# System Information
-/api/v2/monitor/system/status          # System status
-/api/v2/monitor/system/interface       # Interface statistics
-/api/v2/cmdb/system/global             # Global settings
-/api/v2/cmdb/system/interface          # Interface configuration
-/api/v2/cmdb/system/dns                # DNS settings
-
-# Firewall
-/api/v2/cmdb/firewall/address          # Address objects
-/api/v2/cmdb/firewall/addrgrp          # Address groups
-/api/v2/cmdb/firewall/policy           # Firewall policies
-/api/v2/cmdb/firewall/service/custom   # Custom services
-
-# VPN
-/api/v2/cmdb/vpn.ssl.web/portal        # SSL VPN portals
-/api/v2/cmdb/vpn.ipsec/phase1-interface # IPsec Phase 1
-
-# Routing
-/api/v2/cmdb/router/static             # Static routes
-/api/v2/monitor/router/ipv4            # IPv4 routing table
-
-# User & Authentication
-/api/v2/cmdb/user/local                # Local users
-/api/v2/cmdb/user/group                # User groups
+chmod +x fortigate_bulk_operations.py
+python3 fortigate_bulk_operations.py
 ```
 
 </details>
 
 ### 🔗 Resources
 
-- [FortiGate REST API Guide](https://docs.fortinet.com/document/fortigate/7.0.0/administration-guide/940602/rest-api)
-- [Postman Download](https://www.postman.com/downloads/)
+- [FortiGate REST API Documentation](https://docs.fortinet.com/document/fortigate/7.4.0/rest-api-reference)
+- [Postman](https://www.postman.com/)
 
 ---
 
@@ -1281,48 +1254,32 @@ curl -k -X DELETE "https://192.168.1.99/api/v2/cmdb/firewall/policy/100?vdom=roo
 
 ### 📋 Overview
 
-Deploy NetBox with Docker Compose for infrastructure documentation and source of truth.
+Install and configure NetBox using Docker Compose for network infrastructure management.
 
 ### 🎯 What You'll Learn
 
-- Install Docker and Docker Compose
-- Deploy NetBox using docker-compose
-- Create superuser account
-- Configure auto-start with systemd
+- Deploy NetBox with Docker Compose
+- Initial NetBox configuration
+- Create sites, devices, and IP addresses
+- NetBox data modeling best practices
 
 ### 💻 Commands
 
 <details>
-<summary>1. System Update & Prerequisites</summary>
+<summary>1. Install Docker & Docker Compose</summary>
 
 ```bash
 # Update system
 sudo apt update && sudo apt upgrade -y
 
-# Install OpenSSH (if not installed)
-sudo apt install -y openssh-server
-
-# Install prerequisites
-sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release git
-```
-
-</details>
-
-<details>
-<summary>2. Install Docker & Docker Compose</summary>
-
-```bash
-# Install Docker and Docker Compose
+# Install Docker
 sudo apt install -y docker.io docker-compose
 
-# Start Docker service
-sudo systemctl start docker
-sudo systemctl enable docker
+# Add user to docker group
+sudo usermod -aG docker $USER
 
-# Verify Docker service
-sudo systemctl status docker
-
-# Check versions
+# Log out and back in for group changes to take effect
+# Verify
 docker --version
 docker-compose --version
 ```
@@ -1330,61 +1287,56 @@ docker-compose --version
 </details>
 
 <details>
-<summary>3. Configure User Permissions</summary>
+<summary>2. Clone NetBox Docker Repository</summary>
 
 ```bash
-# Add current user to docker group
-sudo usermod -aG docker $USER
+# Create directory for NetBox
+mkdir -p ~/netbox-discovery
+cd ~/netbox-discovery
 
-# Apply group changes (or logout/login)
-newgrp docker
-
-# Verify group membership
-groups
-getent group docker
-
-# Test Docker without sudo
-docker ps
-```
-
-</details>
-
-<details>
-<summary>4. Clone NetBox Docker Repository</summary>
-
-```bash
-# Clone NetBox Docker repository
+# Clone official NetBox Docker repository
 git clone -b release https://github.com/netbox-community/netbox-docker.git
 cd netbox-docker
 
-# List files
+# Verify files
 ls -la
-
-# Create override file for port mapping
-cp docker-compose.override.yml.example docker-compose.override.yml
-
-# Edit override file
-nano docker-compose.override.yml
-```
-
-**docker-compose.override.yml:**
-```yaml
-services:
-  netbox:
-    ports:
-      - "8000:8080"
 ```
 
 </details>
 
 <details>
-<summary>5. Deploy NetBox</summary>
+<summary>3. Configure NetBox</summary>
+
+```bash
+# Copy example configuration
+cp docker-compose.override.yml.example docker-compose.override.yml
+
+# Generate secret key
+SECRET_KEY=$(python3 -c 'import secrets; print(secrets.token_urlsafe(50))')
+echo "SECRET_KEY=$SECRET_KEY"
+
+# Create environment file
+cat << EOF > .env
+SUPERUSER_EMAIL=admin@example.com
+SUPERUSER_PASSWORD=admin
+SUPERUSER_API_TOKEN=$(python3 -c 'import secrets; print(secrets.token_hex(20))')
+SECRET_KEY=$SECRET_KEY
+EOF
+
+# View configuration
+cat .env
+```
+
+</details>
+
+<details>
+<summary>4. Start NetBox</summary>
 
 ```bash
 # Pull Docker images
 docker-compose pull
 
-# Start NetBox stack (background)
+# Start NetBox
 docker-compose up -d
 
 # Check container status
@@ -1393,125 +1345,106 @@ docker-compose ps
 # View logs
 docker-compose logs -f netbox
 
-# Verify port 8000 is listening
-ss -tuln | grep :8000
-
-# Test NetBox is responding
-curl -I http://localhost:8000
+# Wait for startup (about 2 minutes)
+# Press Ctrl+C to stop following logs
 ```
 
 </details>
 
 <details>
-<summary>6. Create Superuser Account</summary>
+<summary>5. Access NetBox Web UI</summary>
 
 ```bash
-# Create admin user
-docker-compose exec netbox /opt/netbox/netbox/manage.py createsuperuser
+# Get NetBox IP
+ip addr show
 
-# Follow prompts:
+# Access via browser:
+# http://<your-ip>:8000
+
+# Default credentials:
 # Username: admin
-# Email: admin@netbox.local
-# Password: (your secure password)
+# Password: admin
+
+# ⚠️ Change password after first login!
 ```
 
 </details>
 
 <details>
-<summary>7. Docker Management Commands</summary>
+<summary>6. NetBox Initial Setup</summary>
+
+**In NetBox UI:**
+
+1. **Create Site:**
+   - Organization > Sites > Add
+   - Name: HQ-DataCenter
+   - Status: Active
+
+2. **Create Device Role:**
+   - Devices > Device Roles > Add
+   - Name: Router
+   - Color: Blue
+
+3. **Create Manufacturer:**
+   - Devices > Manufacturers > Add
+   - Name: Cisco
+
+4. **Create Device Type:**
+   - Devices > Device Types > Add
+   - Manufacturer: Cisco
+   - Model: CSR1000v
+
+5. **Create Device:**
+   - Devices > Devices > Add
+   - Name: vIOS-R1
+   - Device Role: Router
+   - Device Type: Cisco CSR1000v
+   - Site: HQ-DataCenter
+   - Status: Active
+
+</details>
+
+<details>
+<summary>7. NetBox CLI Commands</summary>
 
 ```bash
-# Stop all containers
-docker-compose down
+# Enter NetBox container
+docker-compose exec netbox bash
 
-# Restart services
-docker-compose restart
+# Inside container - Django shell
+python manage.py shell
 
-# Stop specific service
-docker-compose stop netbox
+# Create superuser
+python manage.py createsuperuser
 
-# View running containers
-docker ps
+# Collect static files
+python manage.py collectstatic --no-input
 
-# View all containers (including stopped)
-docker ps -a
+# Run migrations
+python manage.py migrate
 
-# View resource usage
-docker stats
-
-# Clean up unused images
-docker image prune -a
+# Exit container
+exit
 ```
 
 </details>
 
 <details>
-<summary>8. Create Systemd Auto-Start Service</summary>
+<summary>8. NetBox Backup</summary>
 
 ```bash
-# Create systemd service file
-sudo nano /etc/systemd/system/netbox-docker.service
-```
+# Backup NetBox database
+docker-compose exec -T postgres pg_dump -U netbox netbox > netbox_backup_$(date +%Y%m%d).sql
 
-**Service file content:**
-```ini
-[Unit]
-Description=NetBox Docker Compose Application
-Requires=docker.service
-After=docker.service network-online.target
-Wants=network-online.target
+# Backup media files
+docker-compose exec netbox tar -czf /tmp/media_backup.tar.gz /opt/netbox/netbox/media
+docker cp netbox-docker_netbox_1:/tmp/media_backup.tar.gz ./media_backup_$(date +%Y%m%d).tar.gz
 
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-WorkingDirectory=/home/user/netbox-docker
-ExecStart=/usr/bin/docker-compose up -d
-ExecStop=/usr/bin/docker-compose down
-TimeoutStartSec=300
-User=user
-Group=docker
-
-[Install]
-WantedBy=multi-user.target
-```
-
-```bash
-# Enable and start service
-sudo systemctl daemon-reload
-sudo systemctl enable netbox-docker.service
-sudo systemctl start netbox-docker.service
-
-# Check service status
-sudo systemctl status netbox-docker.service
+# List backups
+ls -lh netbox_backup* media_backup*
 ```
 
 </details>
-
-<details>
-<summary>9. Troubleshooting</summary>
-
-```bash
-# Check container logs
-docker-compose logs -f netbox
-docker-compose logs -f netbox-worker
-
-# Restart unhealthy container
-docker-compose restart netbox-worker
-
-# Full reset (WARNING: deletes data)
-docker-compose down -v
-docker-compose up -d
-
-# Check disk space
-df -h
-
-# Check memory
-free -h
-```
-
-</details>
-
-**Access NetBox:** `http://your-ip:8000`
 
 ### 🔗 Resources
 
@@ -1526,73 +1459,123 @@ free -h
 
 ### 📋 Overview
 
-Architecture overview of the auto-discovery stack: ORB, DIODE, and NetBox working together.
+Understand the architecture of NetBox Auto-Discovery using DIODE and ORB Agent.
 
 ### 🎯 What You'll Learn
 
-- Understand the discovery architecture
-- Component roles and responsibilities
-- Network ports and connectivity
-- Data flow from devices to NetBox
+- NetBox Auto-Discovery architecture
+- DIODE Server components
+- ORB Agent functionality
+- Data flow and OAuth authentication
 
-### 🏗️ Architecture Diagram
+### 🏗️ Architecture Overview
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                     NETWORK DISCOVERY ARCHITECTURE                   │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│  ┌─────────────┐                                                     │
-│  │  Network    │  SSH (22) / SNMP (161)                             │
-│  │  Devices    │◄────────────────────┐                              │
-│  │ (R1,R2,FW)  │                     │                              │
-│  └─────────────┘                     │                              │
-│                                      │                              │
-│                              ┌───────┴───────┐                      │
-│                              │   ORB Agent   │                      │
-│                              │  (Discovery)  │                      │
-│                              │   Container   │                      │
-│                              └───────┬───────┘                      │
-│                                      │                              │
-│                                      │ gRPC (8080)                  │
-│                                      ▼                              │
-│                              ┌───────────────┐                      │
-│                              │ DIODE Server  │                      │
-│                              │  (Ingestion)  │                      │
-│                              │   Container   │                      │
-│                              └───────┬───────┘                      │
-│                                      │                              │
-│                                      │ HTTP API                     │
-│                                      ▼                              │
-│  ┌───────────────────────────────────────────────────────────────┐  │
-│  │                         NETBOX                                 │  │
-│  │  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐       │  │
-│  │  │   DIODE     │    │   NetBox    │    │   NetBox    │       │  │
-│  │  │   Plugin    │───▶│   Core      │───▶│  Database   │       │  │
-│  │  │             │    │   (8000)    │    │ (PostgreSQL)│       │  │
-│  │  └─────────────┘    └─────────────┘    └─────────────┘       │  │
-│  └───────────────────────────────────────────────────────────────┘  │
-│                                                                      │
-└─────────────────────────────────────────────────────────────────────┘
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   ORB Agent     │────▶│  DIODE Server   │────▶│ NetBox Plugin   │
+│  (Discovery)    │     │  (Processing)   │     │   (Storage)     │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+       │                        │                        │
+       │                        │                        │
+       ▼                        ▼                        ▼
+  SSH/SNMP               PostgreSQL                  NetBox DB
+  Devices                   Hydra                     
+                          OAuth 2.0
 ```
 
-### 📦 Component Details
+### 🎓 Key Components
 
-| Component | Function | Port | Protocol |
-|-----------|----------|------|----------|
-| **ORB Agent** | Discovers network devices | - | SSH/SNMP |
-| **DIODE Server** | Ingests discovery data | 8080 | gRPC |
-| **DIODE Plugin** | Processes data into NetBox | - | Internal |
-| **NetBox** | Source of Truth | 8000 | HTTP |
-| **OAuth (Hydra)** | Authentication | 4444, 4445 | HTTP |
+<details>
+<summary>1. ORB Agent - Discovery Engine</summary>
 
-### 🔄 Data Flow
+**Purpose:** Discovers network devices and collects configuration data
 
-1. **ORB Agent** connects to network devices via SSH/SNMP
-2. **ORB Agent** sends discovered data to DIODE Server via gRPC
-3. **DIODE Server** authenticates via OAuth and forwards to DIODE Plugin
-4. **DIODE Plugin** processes and creates/updates objects in NetBox
-5. **NetBox** becomes the single source of truth
+**How it works:**
+- Runs as Docker container
+- Uses NAPALM drivers for multi-vendor support
+- Connects to devices via SSH/SNMP/NETCONF
+- Scheduled discovery (configurable interval)
+- Sends data to DIODE Server
+
+**Supported Vendors:**
+- Cisco (IOS, IOS-XE, NXOS, IOS-XR)
+- Juniper (JunOS)
+- Arista (EOS)
+- And more via NAPALM
+
+</details>
+
+<details>
+<summary>2. DIODE Server - Processing Layer</summary>
+
+**Purpose:** Processes and validates network data
+
+**Components:**
+- **Ingester**: Receives data from ORB Agent
+- **PostgreSQL**: Stores raw network data
+- **Reconciler**: Creates NetBox changesets
+- **Hydra**: OAuth 2.0 authorization server
+- **Nginx**: Reverse proxy
+
+**Data Flow:**
+```
+ORB Agent → Ingester → PostgreSQL → Reconciler → NetBox
+                           ↓
+                        Hydra (Auth)
+```
+
+</details>
+
+<details>
+<summary>3. NetBox DIODE Plugin - Integration</summary>
+
+**Purpose:** Receives data from DIODE and updates NetBox
+
+**Functions:**
+- Pulls changesets from DIODE API
+- Creates/updates devices
+- Manages interfaces and IP addresses
+- Handles OAuth authentication
+- Provides UI for credential management
+
+</details>
+
+<details>
+<summary>4. OAuth 2.0 Authentication Flow</summary>
+
+```
+┌─────────────┐                    ┌─────────────┐
+│  ORB Agent  │                    │   Hydra     │
+└──────┬──────┘                    └──────┬──────┘
+       │                                  │
+       │  1. Request Token                │
+       │─────────────────────────────────▶│
+       │                                  │
+       │  2. Validate Credentials         │
+       │◀─────────────────────────────────│
+       │     Return JWT Token             │
+       │                                  │
+       │  3. Send Data + Token            │
+       │─────────────────────────────────▶│
+       │                                  │
+       │  4. Verify Token                 │
+       │◀─────────────────────────────────│
+       │     Accept Data                  │
+       │                                  │
+```
+
+**Three OAuth Clients:**
+1. `orb-agent` - ORB Agent → DIODE
+2. `netbox-to-diode` - NetBox Plugin → DIODE
+3. `diode-to-netbox` - DIODE → NetBox (future use)
+
+</details>
+
+### 🔗 Resources
+
+- [DIODE GitHub](https://github.com/netboxlabs/diode)
+- [ORB Agent GitHub](https://github.com/netboxlabs/orb-agent)
+- [NetBox DIODE Plugin](https://github.com/netboxlabs/netbox-diode-plugin)
 
 ---
 
@@ -1602,119 +1585,70 @@ Architecture overview of the auto-discovery stack: ORB, DIODE, and NetBox workin
 
 ### 📋 Overview
 
-Complete setup guide for NetBox auto-discovery with DIODE and ORB Agent - clean installation from scratch.
+Complete step-by-step setup of NetBox Auto-Discovery with DIODE Server and ORB Agent.
 
 ### 🎯 What You'll Learn
 
-- Install Docker Compose v2
-- Deploy DIODE Server using quickstart script
-- Install NetBox DIODE Plugin manually inside container
-- Configure NetBox for DIODE Plugin
-- Set up ORB Agent with OAuth credentials
-- Run auto-discovery
+- Deploy DIODE Server with Docker
+- Install NetBox DIODE Plugin
+- Configure ORB Agent
+- Troubleshoot common issues
+- Live auto-discovery demonstration
 
 ### 💻 Commands
 
 <details>
-<summary>Prerequisites Check</summary>
+<summary>1. Deploy DIODE Server</summary>
 
 ```bash
-# Verify Docker is installed
-docker --version
-
-# Verify Docker Compose v2
-docker compose version
-
-# Check network connectivity
-ping -c 3 google.com
-```
-
-</details>
-
-<details>
-<summary>SECTION 1: Install Docker Compose v2</summary>
-
-```bash
-# Remove old version
-sudo apt remove docker-compose -y
-
-# Install Docker Compose v2
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-# Set permissions
-sudo chmod +x /usr/local/bin/docker-compose
-
-# Verify
-docker compose version
-```
-
-</details>
-
-<details>
-<summary>SECTION 2: Create Directory Structure</summary>
-
-```bash
-cd ~
-mkdir -p netbox-discovery/{diode,orb-agent}
-cd netbox-discovery
-```
-
-</details>
-
-<details>
-<summary>SECTION 3: Install DIODE Server</summary>
-
-```bash
+# Create directory for DIODE
+mkdir -p ~/netbox-discovery/diode
 cd ~/netbox-discovery/diode
 
-# Download quickstart script
-curl -sSfLo quickstart.sh https://raw.githubusercontent.com/netboxlabs/diode/release/diode-server/docker/scripts/quickstart.sh
+# Download DIODE quick-start script
+curl -o diode-quickstart.sh https://raw.githubusercontent.com/netboxlabs/diode/main/diode-quickstart.sh
 
 # Make executable
-chmod +x quickstart.sh
+chmod +x diode-quickstart.sh
 
-# Run script (replace IP with your NetBox IP)
-./quickstart.sh  http://192.168.1.20:8000 
+# Run quick-start (replace with your NetBox URL)
+./diode-quickstart.sh --netbox-url http://192.168.1.120:8000
 
-# Wait for completion...
+# This script will:
+# - Download docker-compose.yml
+# - Create .env file
+# - Generate OAuth credentials
+# - Start all DIODE services
 
-# Verify files created
-ls -la
-
-# View OAuth credentials (SAVE THESE!)
+# View generated OAuth credentials
 cat oauth2/client/client-credentials.json
 
-# Start DIODE
-docker compose up -d
-
-# Wait 30 seconds
-sleep 30
+# Start DIODE services
+docker-compose up -d
 
 # Check status
-docker compose ps
-
-# Verify all containers are running
+docker-compose ps
 ```
 
 </details>
 
 <details>
-<summary>SECTION 4: Install NetBox DIODE Plugin</summary>
+<summary>2. Install NetBox DIODE Plugin</summary>
 
 ```bash
+# Navigate to NetBox directory
 cd ~/netbox-docker
 
-# Ensure NetBox is running
-docker compose ps
+# Enter NetBox container as root
+docker-compose exec -u root netbox bash
 
-# Enter container as root
-docker compose exec -u root netbox bash
-```
+# Inside container - Update package list
+apt update
 
-**Inside container:**
-```bash
-apt update && apt install -y python3-pip
+# Install pip (if not already installed)
+apt install -y python3-pip
 
+# Install NetBox DIODE plugin
 pip3 install --target=/opt/netbox/venv/lib/python3.12/site-packages \
   --break-system-packages \
   netboxlabs-diode-netbox-plugin
@@ -1722,67 +1656,34 @@ pip3 install --target=/opt/netbox/venv/lib/python3.12/site-packages \
 # Verify installation
 ls -la /opt/netbox/venv/lib/python3.12/site-packages/ | grep -i diode
 
-pip3 list | grep diode
+# Test import
+/opt/netbox/venv/bin/python3 -c "import netbox_diode_plugin; print('Plugin installed successfully')"
 
-/opt/netbox/venv/bin/python3 -c "import netbox_diode_plugin; print('Plugin OK')"
-
+# Exit container
 exit
-```
 
-**Back on host:**
-```bash
-# Commit container as image
+# Commit the container to make plugin permanent
 docker commit netbox-docker-netbox-1 netbox-with-diode:latest
 
-# Verify image
-docker images | grep netbox-with-diode
-
-# Stop NetBox
-docker compose down
+# Update docker-compose.override.yml to use new image
+cat << 'EOF' >> docker-compose.override.yml
+services:
+  netbox:
+    image: netbox-with-diode:latest
+EOF
 ```
 
 </details>
 
 <details>
-<summary>SECTION 5: Configure NetBox for DIODE Plugin</summary>
+<summary>3. Configure NetBox DIODE Plugin</summary>
 
 ```bash
+# Edit NetBox plugins configuration
 cd ~/netbox-docker
+nano configuration/plugins.py
 
-# Update docker-compose.yml
-code docker-compose.yml
-```
-
-**Edit docker-compose.yml:**
-
-Find:
-```yaml
-netbox: &netbox
-  image: docker.io/netboxcommunity/netbox:${VERSION-v4.4-3.4.1}
-```
-
-Change to:
-```yaml
-netbox: &netbox
-  image: netbox-with-diode:latest
-  # image: docker.io/netboxcommunity/netbox:${VERSION-v4.4-3.4.1}
-```
-
-**Save and exit**
-
-```bash
-# Configure plugin
-code configuration/plugins.py
-```
-
-**Get credentials from DIODE:**
-```bash
-# First, get the netbox-to-diode credentials
-cat ~/netbox-discovery/diode/oauth2/client/client-credentials.json | grep -A 3 "netbox-to-diode"
-```
-
-**Add to plugins.py:**
-```python
+# Add at the end of the file:
 PLUGINS = [
     'netbox_diode_plugin',
 ]
@@ -1790,165 +1691,135 @@ PLUGINS = [
 PLUGINS_CONFIG = {
     'netbox_diode_plugin': {
         'diode_target_override': 'grpc://192.168.1.120:8080/diode',
-        'diode_client_id': 'netbox-to-diode',
-        'diode_client_secret': 'K75KBCHg8E6c6CbhwEumby8ct8cApoI8MpM0uMR4g=',
+        'netbox_to_diode_client_secret': 'YOUR_SECRET_FROM_CLIENT_CREDENTIALS_JSON',
+        'hydra_admin_url': 'http://diode-hydra-1:4445',
     }
 }
-```
 
-**Save and exit**
+# Save and exit (Ctrl+O, Enter, Ctrl+X)
 
-```bash
-# Start NetBox
-docker compose up -d
+# Get the actual secret from DIODE credentials
+cd ~/netbox-discovery/diode
+cat oauth2/client/client-credentials.json | grep -A 3 "netbox-to-diode"
 
-# Wait for healthy
-sleep 60
+# Copy the client_secret value and update plugins.py
 
-# Check status
-docker compose ps
+# Restart NetBox
+cd ~/netbox-docker
+docker-compose restart netbox netbox-worker
 
 # Run migrations
-docker compose exec netbox python3 /opt/netbox/netbox/manage.py migrate
+docker-compose exec netbox python /opt/netbox/netbox/manage.py migrate
 
-# Restart
-docker compose restart netbox netbox-worker
-
-# Check logs
-docker compose logs netbox | grep -i plugin
-docker compose logs netbox | tail -30
+# Restart again
+docker-compose restart netbox netbox-worker
 ```
 
 </details>
 
 <details>
-<summary>SECTION 6: Verify NetBox Plugin</summary>
+<summary>4. Fix Network Connectivity (Critical!)</summary>
 
 ```bash
-# Check plugin loaded
-docker compose exec netbox pip list | grep diode
+# Check if NetBox and DIODE can communicate
+cd ~/netbox-docker
+docker-compose exec netbox hostname -i
+# Note the IP (e.g., 172.18.0.5)
 
-# Check logs
-docker compose logs netbox | grep -i diode
+cd ~/netbox-discovery/diode
+docker-compose exec hydra hostname -i
+# Note the IP (e.g., 172.19.0.3)
+
+# If IPs are on different subnets, add network configuration
+# Edit DIODE docker-compose.yml
+nano docker-compose.yml
+
+# Add to the BOTTOM of the file:
+networks:
+  default:
+    external: true
+    name: netbox-docker_default
+
+# Save and exit (Ctrl+O, Enter, Ctrl+X)
+
+# Restart DIODE services
+docker-compose down
+docker-compose up -d
+
+# Verify connectivity
+cd ~/netbox-docker
+docker-compose exec netbox curl http://diode-hydra-1:4445/health/ready
+# Should return: {"status":"ok"}
 ```
 
-**Verify in UI:**
-- Open: http://192.168.1.120:8000
-- Login
-- Check for "Diode" in sidebar menu
-
 </details>
 
 <details>
-<summary>SECTION 7: Create ORB Agent OAuth Client</summary>
-
-**In NetBox UI:**
-1. Navigate to: Diode → Client Credentials
-2. Click "Create Client Credentials"
-3. Copy the `client_id` and `client_secret`
-
-**Save these for next step!**
-
-</details>
-
-<details>
-<summary>SECTION 8: Configure ORB Agent</summary>
+<summary>5. Deploy ORB Agent</summary>
 
 ```bash
+# Create directory for ORB Agent
+mkdir -p ~/netbox-discovery/orb-agent
 cd ~/netbox-discovery/orb-agent
 
-# Create config file
-code config.yaml
-```
+# Create config.yaml (use OAuth credentials from NetBox UI)
+# First, create OAuth credentials in NetBox:
+# NetBox UI > Plugins > DIODE > Client Credentials > Add
 
-**Add configuration (replace credentials):**
-```yaml
-orb:
-  config_manager:
-    active: local
+# Create config.yaml
+cat << 'EOF' > config.yaml
+discovery:
+  device_credentials:
+    - username: cisco
+      password: cisco
+      driver: ios
+  interfaces:
+    enabled: true
+  mac_addresses:
+    enabled: true
+  ip_addresses:
+    enabled: true
+  vlans:
+    enabled: true
+  
+devices:
+  - hostname: 192.168.1.10
+    driver: ios
+    
+  - hostname: 192.168.1.11
+    driver: ios
+    
+  - hostname: 192.168.1.12
+    driver: ios
 
-  backends:
-    device_discovery:
-    network_discovery:
+oauth:
+  client_id: your-client-id-from-netbox
+  client_secret: your-client-secret-from-netbox
+  token_url: http://192.168.1.120:8080/oauth2/token
 
-    common:
-      diode:
-        target: grpc://localhost:8080/diode
-        client_id: orb-discovery-a-2292af1c37b98c20
-        client_secret: YOUR_CLIENT_SECRET_HERE
-        agent_name: orb-netbox-discovery
-        tls:
-          insecure: true
+diode:
+  target: 192.168.1.120:8080
+  
+schedule:
+  interval: 900  # 15 minutes
+EOF
 
-      agent_labels:
-        environment: lab
-        location: networkcoder
-
-  policies:
-    device_discovery:
-      cisco_routers:
-        config:
-          schedule: "*/2 * * * *"
-          defaults:
-            site: Main-DC
-            tenant: NetworkCoder-Lab
-            role: Router
-            status: active
-        scope:
-          - driver: ios
-            hostname: 192.168.1.101
-            username: ansible
-            password: ansible@123
-
-          - driver: ios
-            hostname: 192.168.1.102
-            username: ansible
-            password: ansible@123
-
-          - driver: ios
-            hostname: 192.168.1.103
-            username: ansible
-            password: ansible@123
-
-    network_discovery:
-      lab_network_scan:
-        config:
-          schedule: "*/5 * * * *"
-        scope:
-          targets:
-            - 192.168.1.0/24
-
-logs:
-  level: info
-  format: json
-```
-
-**Save and exit**
-
-```bash
-# Create docker-compose file
-code docker-compose.yml
-```
-
-**Add:**
-```yaml
+# Create docker-compose.yml for ORB Agent
+cat << 'EOF' > docker-compose.yml
 services:
   orb-agent:
     image: netboxlabs/orb-agent:latest
     container_name: orb-agent
     volumes:
-      - ./config.yaml:/app/config.yaml
+      - /home/user/netbox-discovery/orb-agent/config.yaml:/app/config.yaml
     restart: unless-stopped
-```
+EOF
 
-**Save and exit**
+# IMPORTANT: Update path to absolute path
+# Replace /home/user with your actual home directory path
 
-```bash
 # Start ORB Agent
-docker compose up -d
-
-# Wait 10 seconds
-sleep 10
+docker-compose up -d
 
 # Check logs
 docker logs -f orb-agent
@@ -1957,253 +1828,391 @@ docker logs -f orb-agent
 </details>
 
 <details>
-<summary>SECTION 9: Verification Commands</summary>
-
-### Check All Services Status
+<summary>6. Verify Auto-Discovery</summary>
 
 ```bash
-# NetBox
-cd ~/netbox-docker
-docker compose ps
-
-# DIODE
-cd ~/netbox-discovery/diode
-docker compose ps
-
-# ORB Agent
+# Check ORB Agent logs
 cd ~/netbox-discovery/orb-agent
-docker logs orb-agent --tail 50
-```
-
-### Check Data Flow
-
-```bash
-# ORB Agent logs (device discovery)
 docker logs orb-agent | grep "Successful ingestion"
 
-# DIODE Ingester logs
+# Check DIODE ingester logs
 cd ~/netbox-discovery/diode
-docker compose logs diode-ingester | grep -i success
+docker-compose logs diode-ingester | grep -i "success"
 
-# DIODE Reconciler logs
-docker compose logs diode-reconciler | grep -i "applied"
+# Check DIODE reconciler logs
+docker-compose logs diode-reconciler | grep "applied successfully"
 
-# NetBox logs
-cd ~/netbox-docker
-docker compose logs netbox | grep -i diode
-```
-
-### Check Discovered Devices in NetBox
-
-**Browser:**
-- Open: http://192.168.1.120:8000
-- Navigate to: Devices → Devices
-- Verify routers appear
-
-</details>
-
-<details>
-<summary>SECTION 10: Monitoring Commands</summary>
-
-### Real-time Monitoring
-
-```bash
-# Watch ORB Agent discover devices
-docker logs -f orb-agent
-
-# Watch DIODE ingester receive data
-cd ~/netbox-discovery/diode
-docker compose logs -f diode-ingester
-
-# Watch DIODE reconciler push to NetBox
-docker compose logs -f diode-reconciler
-
-# Watch NetBox receive data
-cd ~/netbox-docker
-docker compose logs -f netbox
-```
-
-### Check Authentication
-
-```bash
-# Check Hydra OAuth clients
-cd ~/netbox-discovery/diode
-docker compose exec hydra hydra list clients --endpoint http://localhost:4445
-
-# Should show:
-# - diode-ingest
-# - diode-to-netbox
-# - netbox-to-diode
-# - orb-discovery-a-xxx
-```
-
-### Troubleshooting Commands
-
-```bash
-# Check if ORB can reach DIODE
-docker logs orb-agent | grep -i error
-docker logs orb-agent | grep -i "authentication"
-
-# Check if DIODE can reach NetBox
-cd ~/netbox-discovery/diode
-docker compose logs diode-reconciler | grep -i error
-docker compose logs diode-reconciler | grep -i timeout
-
-# Check NetBox plugin errors
-cd ~/netbox-docker
-docker compose logs netbox | grep -i error
+# Check NetBox UI
+# Navigate to: Devices > Devices
+# You should see discovered devices!
 ```
 
 </details>
 
 <details>
-<summary>Quick Reference - All Service Locations</summary>
+<summary>7. Troubleshooting Commands</summary>
 
 ```bash
-# NetBox
+# Check all container status
+cd ~/netbox-docker && docker-compose ps
+cd ~/netbox-discovery/diode && docker-compose ps
+cd ~/netbox-discovery/orb-agent && docker-compose ps
+
+# Check NetBox plugin configuration
 cd ~/netbox-docker
+docker-compose exec netbox python /opt/netbox/netbox/manage.py shell
+>>> from django.conf import settings
+>>> print(settings.PLUGINS_CONFIG.get('netbox_diode_plugin'))
+>>> exit()
 
-# DIODE Server
+# List OAuth clients in Hydra
 cd ~/netbox-discovery/diode
+docker-compose exec hydra hydra list clients --endpoint http://localhost:4445
 
-# ORB Agent
-cd ~/netbox-discovery/orb-agent
-```
+# Test OAuth token generation
+curl -X POST http://192.168.1.120:8080/oauth2/token \
+  -d "grant_type=client_credentials" \
+  -d "client_id=YOUR_CLIENT_ID" \
+  -d "client_secret=YOUR_CLIENT_SECRET"
 
-</details>
-
-<details>
-<summary>Quick Start/Stop Commands</summary>
-
-```bash
-# Start all services
-cd ~/netbox-docker && docker compose up -d
-cd ~/netbox-discovery/diode && docker compose up -d
-cd ~/netbox-discovery/orb-agent && docker compose up -d
-
-# Stop all services
-cd ~/netbox-docker && docker compose down
-cd ~/netbox-discovery/diode && docker compose down
-cd ~/netbox-discovery/orb-agent && docker compose down
+# Check DIODE API health
+curl http://192.168.1.120:8080/health
 
 # Restart all services
-cd ~/netbox-docker && docker compose restart
-cd ~/netbox-discovery/diode && docker compose restart
-cd ~/netbox-discovery/orb-agent && docker compose restart
+cd ~/netbox-docker && docker-compose restart
+cd ~/netbox-discovery/diode && docker-compose restart
+cd ~/netbox-discovery/orb-agent && docker-compose restart
 ```
 
 </details>
 
-<details>
-<summary>Configuration Files Reference</summary>
+### 🚨 Common Issues & Solutions
 
-### DIODE OAuth Credentials
+<details>
+<summary>❌ Error: "Missing netbox to diode client secret"</summary>
+
+**Screenshot:**
+
+<p align="center">
+  <img src="assets/error-missing-client-secret.png" alt="Missing Client Secret Error" width="600">
+</p>
+
+**Error Message:**
+```
+Please update the plugin configuration to access this feature. 
+Missing netbox to diode client secret.
+```
+
+**Root Cause:**
+The NetBox DIODE Plugin configuration is missing or incorrectly configured with the OAuth client secret parameter.
+
+**Why This Happens:**
+1. ❌ Incorrect parameter name used in `plugins.py` (`diode_client_secret` instead of `netbox_to_diode_client_secret`)
+2. ❌ Plugin configuration not updated after initial installation
+3. ❌ NetBox services not restarted after configuration changes
+4. ❌ Client secret doesn't match the value in DIODE's `client-credentials.json`
+
+---
+
+**✅ STEP-BY-STEP FIX:**
+
+**1. Verify DIODE has the Client Credentials**
+
 ```bash
+# Navigate to DIODE directory
+cd ~/netbox-discovery/diode
+
+# Check if client credentials file exists
+cat oauth2/client/client-credentials.json
+```
+
+**Expected output:**
+```json
+[
+  {
+    "client_id": "diode-ingest",
+    "client_secret": "tcgnPFpZ3qVtxyqR+sGXIexpxAk8wul2S8yu7Duans=",
+    "grant_types": ["client_credentials"],
+    "scope": "diode:ingest"
+  },
+  {
+    "client_id": "netbox-to-diode",
+    "client_secret": "GdS63SRQ4I0G15I0V35uQYD7V+qnNUTjZCCD10yQvQ=",
+    "grant_types": ["client_credentials"],
+    "scope": "diode:read diode:write"
+  },
+  {
+    "client_id": "diode-to-netbox",
+    "client_secret": "NypFsBMV1rQTRDX5jO7Utez57DwF503gk8e2QKADLU=",
+    "grant_types": ["client_credentials"],
+    "scope": "netbox:read netbox:write"
+  }
+]
+```
+
+**✅ Copy the `netbox-to-diode` client_secret value - you'll need this!**
+
+---
+
+**2. Verify Hydra Has the Client**
+
+```bash
+# Check Hydra container is running
+cd ~/netbox-discovery/diode
+docker-compose ps hydra
+
+# List all OAuth clients in Hydra
+docker-compose exec hydra hydra list clients --endpoint http://localhost:4445
+```
+
+**Expected output should include:**
+```
+CLIENT ID                    GRANT TYPES              RESPONSE TYPES
+netbox-to-diode              client_credentials       token
+diode-to-netbox              client_credentials       token
+diode-ingest                 client_credentials       token
+```
+
+**✅ If you see `netbox-to-diode`, the client exists in Hydra**
+
+---
+
+**3. Check NetBox Plugin Configuration**
+
+```bash
+# Navigate to NetBox directory
+cd ~/netbox-docker
+
+# Check the plugins configuration file
+cat configuration/plugins.py | grep -A 10 "netbox_diode_plugin"
+```
+
+**❌ WRONG Configuration (causes error):**
+```python
+PLUGINS_CONFIG = {
+    'netbox_diode_plugin': {
+        'diode_target_override': 'grpc://192.168.1.20:8080/diode',
+        'diode_client_id': 'netbox-to-diode',           # ❌ Plugin doesn't use this
+        'diode_client_secret': 'GdS63SRQ4I0G...',       # ❌ WRONG parameter name
+    }
+}
+```
+
+**✅ CORRECT Configuration:**
+```python
+PLUGINS_CONFIG = {
+    'netbox_diode_plugin': {
+        'diode_target_override': 'grpc://192.168.1.20:8080/diode',
+        'netbox_to_diode_client_secret': 'GdS63SRQ4I0G15I0V35uQYD7V+qnNUTjZCCD10yQvQ=',  # ✅ CORRECT
+        'hydra_admin_url': 'http://diode-hydra-1:4445',  # ✅ REQUIRED
+    }
+}
+```
+
+**🔑 Key Differences:**
+1. ❌ Remove `diode_client_id` - plugin doesn't use this parameter
+2. ✅ Change `diode_client_secret` → `netbox_to_diode_client_secret`
+3. ✅ Add `hydra_admin_url` parameter (required for plugin to function)
+
+---
+
+**4. Update NetBox Configuration**
+
+```bash
+cd ~/netbox-docker
+
+# Edit the plugins configuration
+nano configuration/plugins.py
+```
+
+**Update to the CORRECT configuration:**
+
+```python
+PLUGINS = [
+    'netbox_diode_plugin',
+]
+
+PLUGINS_CONFIG = {
+    'netbox_diode_plugin': {
+        'diode_target_override': 'grpc://192.168.1.20:8080/diode',
+        'netbox_to_diode_client_secret': 'GdS63SRQ4I0G15I0V35uQYD7V+qnNUTjZCCD10yQvQ=',  # Use YOUR actual secret
+        'hydra_admin_url': 'http://diode-hydra-1:4445',
+    }
+}
+```
+
+**📝 Replace the secret with YOUR actual value from `client-credentials.json`**
+
+**Save:** `Ctrl+O`, `Enter`, `Ctrl+X`
+
+---
+
+**5. Restart NetBox Services**
+
+```bash
+cd ~/netbox-docker
+
+# Restart NetBox and NetBox worker
+docker-compose restart netbox netbox-worker
+
+# Wait 30 seconds for services to fully restart
+sleep 30
+
+# Check if services are running
+docker-compose ps
+```
+
+**Expected:** Both `netbox` and `netbox-worker` should show status "Up"
+
+---
+
+**6. Verify Configuration Was Applied**
+
+```bash
+# Enter NetBox container Python shell
+docker-compose exec netbox python /opt/netbox/netbox/manage.py shell
+```
+
+**Inside Python shell, run:**
+```python
+from django.conf import settings
+config = settings.PLUGINS_CONFIG.get('netbox_diode_plugin')
+print(config)
+```
+
+**Expected output:**
+```python
+{
+    'diode_target_override': 'grpc://192.168.1.20:8080/diode',
+    'netbox_to_diode_client_secret': 'GdS63SRQ4I0G15I0V35uQYD7V+qnNUTjZCCD10yQvQ=',
+    'hydra_admin_url': 'http://diode-hydra-1:4445'
+}
+```
+
+**✅ Verify `netbox_to_diode_client_secret` is NOT `None`**
+
+**Exit Python shell:** `exit()`
+
+---
+
+**7. Test NetBox UI**
+
+1. **Open browser:** `http://192.168.1.20:8000`
+2. **Login** as admin
+3. **Navigate to:** Plugins → DIODE → Client Credentials
+4. **Click:** "+ Add a Credential"
+
+**✅ The error should be GONE!**
+
+---
+
+**📋 Complete Verification Checklist:**
+
+```bash
+# Run all these commands to verify everything:
+
+# 1. Check DIODE credentials file exists
 cat ~/netbox-discovery/diode/oauth2/client/client-credentials.json
+
+# 2. Check Hydra has the client
+cd ~/netbox-discovery/diode
+docker-compose exec hydra hydra list clients --endpoint http://localhost:4445
+
+# 3. Check NetBox plugin config syntax
+cd ~/netbox-docker
+grep -A 5 "netbox_diode_plugin" configuration/plugins.py
+
+# 4. Verify NetBox can reach Hydra
+docker-compose exec netbox curl http://diode-hydra-1:4445/health/ready
+# Should return: {"status":"ok"}
+
+# 5. Check NetBox logs for plugin errors
+docker-compose logs netbox | grep -i diode | tail -20
 ```
 
-### NetBox Plugin Config
+---
+
+**🎯 Quick Fix Summary:**
+
+If you see the "Missing netbox to diode client secret" error:
+
 ```bash
-cat ~/netbox-docker/configuration/plugins.py
+# 1. Get the secret from DIODE
+cd ~/netbox-discovery/diode
+cat oauth2/client/client-credentials.json | grep -A 3 "netbox-to-diode"
+
+# 2. Update NetBox config with CORRECT parameter name
+cd ~/netbox-docker
+nano configuration/plugins.py
+
+# Make sure it says:
+# 'netbox_to_diode_client_secret': 'YOUR_SECRET'
+# NOT: 'diode_client_secret'
+
+# And includes:
+# 'hydra_admin_url': 'http://diode-hydra-1:4445'
+
+# 3. Restart NetBox
+docker-compose restart netbox netbox-worker
+
+# 4. Wait 30 seconds and test
+sleep 30
+# Open browser and check Plugins > DIODE > Client Credentials
 ```
 
-### ORB Agent Config
-```bash
-cat ~/netbox-discovery/orb-agent/config.yaml
-```
+---
 
-### DIODE .env (Reconciler credentials)
+**Additional Notes:**
+
+- The plugin expects the parameter name `netbox_to_diode_client_secret` (not `diode_client_secret`)
+- The `hydra_admin_url` parameter is required for the plugin to manage OAuth clients
+- Client ID is hardcoded as `netbox-to-diode` in the plugin - no need to specify it
+- Ensure NetBox and DIODE containers are on the same Docker network for connectivity
+
+**This configuration error is one of the most common issues during DIODE plugin setup. Following these exact steps will resolve it!**
+
+</details>
+
+<details>
+<summary>Issue 2: Network Connectivity - "Could not resolve host"</summary>
+
+**Solution:**
 ```bash
-cat ~/netbox-discovery/diode/.env | grep DIODE_TO_NETBOX
+cd ~/netbox-discovery/diode
+nano docker-compose.yml
+
+# Add to bottom:
+networks:
+  default:
+    external: true
+    name: netbox-docker_default
+
+# Restart
+docker-compose down && docker-compose up -d
 ```
 
 </details>
 
 <details>
-<summary>Health Check Commands</summary>
+<summary>Issue 3: ORB Agent Config Not Found</summary>
 
+**Solution:**
 ```bash
-# NetBox health
-curl http://192.168.1.120:8000/api/ -I
+# Use absolute path in docker-compose.yml
+volumes:
+  - /home/username/netbox-discovery/orb-agent/config.yaml:/app/config.yaml
 
-# DIODE health
-curl http://192.168.1.120:8080/diode -I
-
-# Check all Docker containers
-docker ps -a
-
-# Check Docker resources
-docker system df
-```
-
-</details>
-
-<details>
-<summary>Complete Installation Checklist</summary>
-
-- [ ] Docker Compose v2 installed
-- [ ] Directory structure created
-- [ ] DIODE server running (7 containers)
-- [ ] NetBox plugin installed
-- [ ] NetBox using custom image
-- [ ] Plugin configured with OAuth credentials
-- [ ] NetBox showing DIODE menu
-- [ ] ORB Agent OAuth client created in NetBox UI
-- [ ] ORB Agent configured with credentials
-- [ ] ORB Agent discovering devices
-- [ ] DIODE receiving data
-- [ ] DIODE pushing to NetBox
-- [ ] Devices appearing in NetBox UI
-
-</details>
-
-<details>
-<summary>Expected Container Counts</summary>
-
-```bash
-# NetBox: 6 containers
-# - netbox
-# - netbox-worker
-# - postgres
-# - redis
-# - redis-cache
-# - (housekeeping - may be absent)
-
-# DIODE: 7 containers
-# - diode-ingester
-# - diode-reconciler
-# - diode-auth
-# - hydra
-# - postgres
-# - redis
-# - ingress-nginx
-
-# ORB Agent: 1 container
-# - orb-agent
-
-# Total: ~14 containers
-docker ps | wc -l
-```
-
-</details>
-
-<details>
-<summary>Port Reference</summary>
-
-```
-8000 - NetBox UI
-8080 - DIODE Server (gRPC)
-4444 - Hydra public (OAuth tokens)
-4445 - Hydra admin (OAuth introspection)
+# Not relative path like:
+# - ./config.yaml:/app/config.yaml
 ```
 
 </details>
 
 ### 🔗 Resources
 
-- [DIODE GitHub](https://github.com/netboxlabs/diode)
+- [DIODE Quick Start Guide](https://github.com/netboxlabs/diode)
 - [ORB Agent Documentation](https://github.com/netboxlabs/orb-agent)
-- [NetBox DIODE Plugin](https://github.com/netboxlabs/diode-netbox-plugin)
+- [NetBox DIODE Plugin](https://github.com/netboxlabs/netbox-diode-plugin)
 
 ---
 
@@ -2213,201 +2222,150 @@ docker ps | wc -l
 
 ### 📋 Overview
 
-Network testing with pyATS and automated inventory sync with NetBox as source of truth.
+Integrate Cisco pyATS testing framework with NetBox for automated network validation.
 
 ### 🎯 What You'll Learn
 
 - Install and configure pyATS
-- Create testbed files manually and from NetBox
-- Use pyATS for network testing
-- Learn, Parse, and Diff workflows
+- Create testbed from NetBox data
+- Run automated network tests
+- Generate test reports
 
 ### 💻 Commands
 
 <details>
-<summary>1. Install pyATS</summary>
+<summary>1. Install pyATS and Genie</summary>
 
 ```bash
 # Activate virtual environment
 source ~/ansible-venv/bin/activate
 
-# Install pyATS full package
-pip install "pyats[full]"
+# Install pyATS
+pip install pyats[full]
 
-# Install pyATS contrib (includes NetBox plugin)
-pip install pyats.contrib
+# Install Genie
+pip install genie
 
 # Verify installation
 pyats version
-genie --help
+genie --version
 ```
 
 </details>
 
 <details>
-<summary>2. Set Environment Variables</summary>
+<summary>2. Create pyATS Testbed</summary>
 
 ```bash
-# Add to ~/.bashrc
-cat << 'EOF' >> ~/.bashrc
+# Create testbed directory
+mkdir -p ~/pyats-netbox && cd ~/pyats-netbox
 
-# NetBox API settings
-export NETBOX_URL="http://192.168.1.120:8000"
-export NETBOX_USER_TOKEN="your-netbox-api-token"
-
-# Device credentials for pyATS
-export DEF_PYATS_USER="ansible"
-export DEF_PYATS_PASS="ansible@123"
-EOF
-
-# Reload bashrc
-source ~/.bashrc
-
-# Verify variables are set
-echo "NETBOX_URL: $NETBOX_URL"
-echo "NETBOX_USER_TOKEN: $NETBOX_USER_TOKEN"
-echo "DEF_PYATS_USER: $DEF_PYATS_USER"
-```
-
-</details>
-
-<details>
-<summary>3. Create Testbed Manually</summary>
-
-```yaml
-# testbed.yaml
----
+# Create testbed.yaml
+cat << 'EOF' > testbed.yaml
 testbed:
-  name: NetworkCoder-Lab
+  name: Network_Lab
+  credentials:
+    default:
+      username: cisco
+      password: cisco
 
 devices:
   vIOS-R1:
     os: ios
     type: router
-    platform: iosv
     connections:
-      defaults:
-        class: unicon.Unicon
       cli:
         protocol: ssh
-        ip: 192.168.1.101
-        port: 22
-    credentials:
-      default:
-        username: "%ENV{DEF_PYATS_USER}"
-        password: "%ENV{DEF_PYATS_PASS}"
-      enable:
-        password: "%ENV{DEF_PYATS_PASS}"
-
+        ip: 192.168.1.10
+        
   vIOS-R2:
     os: ios
     type: router
-    platform: iosv
     connections:
-      defaults:
-        class: unicon.Unicon
       cli:
         protocol: ssh
-        ip: 192.168.1.102
-        port: 22
-    credentials:
-      default:
-        username: "%ENV{DEF_PYATS_USER}"
-        password: "%ENV{DEF_PYATS_PASS}"
-      enable:
-        password: "%ENV{DEF_PYATS_PASS}"
-
+        ip: 192.168.1.11
+        
   vIOS-R3:
     os: ios
     type: router
-    platform: iosv
     connections:
-      defaults:
-        class: unicon.Unicon
       cli:
         protocol: ssh
-        ip: 192.168.1.103
-        port: 22
-    credentials:
-      default:
-        username: "%ENV{DEF_PYATS_USER}"
-        password: "%ENV{DEF_PYATS_PASS}"
-      enable:
-        password: "%ENV{DEF_PYATS_PASS}"
+        ip: 192.168.1.12
+EOF
+
+# Verify testbed
+pyats validate testbed testbed.yaml
 ```
 
 </details>
 
 <details>
-<summary>4. Generate Testbed from NetBox</summary>
+<summary>3. Test Device Connectivity</summary>
 
 ```bash
-# Generate testbed from NetBox
-pyats create testbed netbox \
-    --output testbed-netbox.yaml \
-    --netbox-url=${NETBOX_URL} \
-    --user-token=${NETBOX_USER_TOKEN} \
-    --def_user='%ENV{DEF_PYATS_USER}' \
-    --def_pass='%ENV{DEF_PYATS_PASS}' \
-    --url_filter='site=main-dc'
+# Connect to device
+pyats shell --testbed-file testbed.yaml
 
-# Note: site filter uses slug (lowercase with hyphens)
-
-# View generated testbed
-cat testbed-netbox.yaml
-```
-
-</details>
-
-<details>
-<summary>5. pyATS Interactive Shell</summary>
-
-```bash
-# Start interactive shell
-pyats shell --testbed testbed.yaml
-
-# In the shell:
->>> testbed.devices
->>> device = testbed.devices['vIOS-R1']
->>> device.connect()
->>> device.execute('show version')
->>> device.execute('show ip interface brief')
->>> device.disconnect()
+# Inside pyATS shell
+>>> devices.vIOS-R1.connect()
+>>> devices.vIOS-R1.execute('show version')
+>>> devices.vIOS-R1.disconnect()
 >>> exit()
 ```
 
 </details>
 
 <details>
-<summary>6. Parse Command Output</summary>
+<summary>4. Parse Show Commands</summary>
 
 ```bash
+# Create parser script
+cat << 'EOF' > parse_devices.py
+#!/usr/bin/env python3
+from pyats import topology
+from genie.conf import Genie
+
+# Load testbed
+testbed = topology.loader.load('testbed.yaml')
+
+# Connect to device
+device = testbed.devices['vIOS-R1']
+device.connect()
+
 # Parse show version
-pyats parse "show version" --testbed testbed.yaml --device vIOS-R1
+output = device.parse('show version')
+print(f"Hostname: {output['version']['hostname']}")
+print(f"Version: {output['version']['version']}")
+print(f"Uptime: {output['version']['uptime']}")
 
-# Parse show ip interface brief
-pyats parse "show ip interface brief" --testbed testbed.yaml --device vIOS-R1
+# Parse show interfaces
+interfaces = device.parse('show interfaces')
+for intf in interfaces['interfaces']:
+    print(f"Interface: {intf}")
+    print(f"  Status: {interfaces['interfaces'][intf]['oper_status']}")
 
-# Parse show running-config
-pyats parse "show running-config" --testbed testbed.yaml --device vIOS-R1
+device.disconnect()
+EOF
 
-# Parse across all devices
-pyats parse "show version" --testbed testbed.yaml
+chmod +x parse_devices.py
+python3 parse_devices.py
 ```
 
 </details>
 
 <details>
-<summary>7. Learn Feature State</summary>
+<summary>5. Learn Device Features</summary>
 
 ```bash
-# Learn interface state
+# Learn interface configuration
 pyats learn interface --testbed testbed.yaml --device vIOS-R1 --output interface_state/
 
-# Learn routing state
+# Learn routing table
 pyats learn routing --testbed testbed.yaml --device vIOS-R1 --output routing_state/
 
-# Learn OSPF state
+# Learn OSPF
 pyats learn ospf --testbed testbed.yaml --device vIOS-R1 --output ospf_state/
 
 # Learn all features
@@ -2417,38 +2375,169 @@ pyats learn all --testbed testbed.yaml --output all_features/
 </details>
 
 <details>
-<summary>8. Diff - Compare States</summary>
+<summary>6. Create Test Script</summary>
 
 ```bash
-# First, learn the "before" state
+# Create test script
+cat << 'EOF' > test_network.py
+#!/usr/bin/env python3
+from pyats import aetest
+from genie.testbed import load
+
+class CommonSetup(aetest.CommonSetup):
+    @aetest.subsection
+    def connect_to_devices(self, testbed):
+        for device in testbed.devices.values():
+            device.connect()
+
+class InterfaceTest(aetest.Testcase):
+    @aetest.setup
+    def setup(self, testbed):
+        self.device = testbed.devices['vIOS-R1']
+    
+    @aetest.test
+    def test_interfaces_up(self):
+        output = self.device.parse('show interfaces')
+        failed_interfaces = []
+        
+        for intf in output['interfaces']:
+            status = output['interfaces'][intf]['oper_status']
+            if status != 'up':
+                failed_interfaces.append(intf)
+        
+        if failed_interfaces:
+            self.failed(f"Interfaces down: {failed_interfaces}")
+        else:
+            self.passed("All interfaces are up")
+
+class CommonCleanup(aetest.CommonCleanup):
+    @aetest.subsection
+    def disconnect_from_devices(self, testbed):
+        for device in testbed.devices.values():
+            device.disconnect()
+
+if __name__ == '__main__':
+    import argparse
+    from pyats.topology import loader
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--testbed', dest='testbed')
+    args, unknown = parser.parse_known_args()
+    
+    testbed = loader.load(args.testbed)
+    aetest.main(testbed=testbed)
+EOF
+
+chmod +x test_network.py
+python3 test_network.py --testbed testbed.yaml
+```
+
+</details>
+
+<details>
+<summary>7. Compare Network States</summary>
+
+```bash
+# Learn "before" state
 pyats learn interface --testbed testbed.yaml --output before/
 
-# Make some changes on devices...
+# Make changes on devices...
 
-# Learn the "after" state
+# Learn "after" state
 pyats learn interface --testbed testbed.yaml --output after/
 
-# Compare the two states
+# Compare states
 pyats diff before/ after/
 ```
 
 </details>
 
 <details>
-<summary>9. Run pyATS Job</summary>
+<summary>8. Integration with NetBox</summary>
 
 ```bash
-# Create a simple job file (job.py)
-cat << 'EOF' > job.py
+# Create script to sync pyATS results to NetBox
+cat << 'EOF' > sync_to_netbox.py
+#!/usr/bin/env python3
+import requests
+import json
+from pyats import topology
+
+# NetBox configuration
+NETBOX_URL = "http://192.168.1.120:8000"
+NETBOX_TOKEN = "your-netbox-api-token"
+headers = {
+    "Authorization": f"Token {NETBOX_TOKEN}",
+    "Content-Type": "application/json"
+}
+
+# Load testbed
+testbed = topology.loader.load('testbed.yaml')
+
+# Connect and collect data
+device = testbed.devices['vIOS-R1']
+device.connect()
+
+# Parse interfaces
+interfaces = device.parse('show interfaces')
+
+# Update NetBox
+for intf_name in interfaces['interfaces']:
+    intf_data = interfaces['interfaces'][intf_name]
+    
+    # Create/update interface in NetBox
+    data = {
+        "name": intf_name,
+        "type": "other",
+        "enabled": intf_data['enabled'],
+        "mtu": intf_data.get('mtu', 1500),
+        "description": intf_data.get('description', '')
+    }
+    
+    # API call to NetBox
+    response = requests.post(
+        f"{NETBOX_URL}/api/dcim/interfaces/",
+        headers=headers,
+        json=data
+    )
+    
+    print(f"Updated interface: {intf_name} - Status: {response.status_code}")
+
+device.disconnect()
+EOF
+
+chmod +x sync_to_netbox.py
+python3 sync_to_netbox.py
+```
+
+</details>
+
+<details>
+<summary>9. Automated Testing with Job File</summary>
+
+```bash
+# Create job file
+cat << 'EOF' > network_test_job.py
 import os
 from pyats.easypy import run
 
 def main(runtime):
-    run(testscript='test_script.py', runtime=runtime)
+    """Main job execution"""
+    
+    # Run test script
+    run(
+        testscript='test_network.py',
+        runtime=runtime,
+        taskid='InterfaceTests'
+    )
 EOF
 
-# Run the job
-pyats run job job.py --testbed testbed.yaml
+# Run job
+pyats run job network_test_job.py --testbed-file testbed.yaml
+
+# View results
+# Results are in: ./archive/
+ls -la archive/
 ```
 
 </details>
@@ -2686,6 +2775,29 @@ claude mcp add netbox \
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 📝 Changelog
+
+### v12.0 (2025-01-21)
+- ✅ Added comprehensive OAuth client secret error troubleshooting to Video 9
+- ✅ Documented "Missing netbox to diode client secret" error with screenshots
+- ✅ Added step-by-step verification and fix procedures
+- ✅ Included complete diagnostic commands and verification checklist
+- ✅ Added explanation of correct parameter names and common mistakes
+- ✅ Enhanced troubleshooting section with network connectivity fixes
+
+### v11.0 (2025-01-15)
+- ✅ Added Video 11: NetBox + MCP Integration
+- ✅ Comprehensive MCP setup documentation
+- ✅ Claude Code CLI installation guide
+- ✅ Natural language NetBox queries
+
+### v10.0 (2025-01-10)
+- Initial public release
+- Videos 1-10 complete documentation
+- Full command reference for all videos
 
 ---
 

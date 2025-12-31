@@ -46,6 +46,9 @@ This series takes you from zero to hero in network automation. Build a complete 
 | 10 | [pyATS + NetBox](#video-10-pyats--netbox-integration) | pyATS, Testing, NetBox | [▶️ YouTube](https://www.youtube.com/watch?v=V_PmWxC2QDA) |
 | 11 | [MCP Fundamentals](#video-11-mcp-fundamentals---quick-breakdown) | MCP, Architecture, FastMCP | [▶️ YouTube](https://www.youtube.com/watch?v=DDQL5OQDLJU) |
 | 12 | [NetBox + MCP Hands-On](#video-12-netbox--mcp-hands-on-setup) | Claude Code, Setup, Queries | [▶️ YouTube](https://www.youtube.com/watch?v=YOUR_VIDEO_ID) |
+| 13 | [Custom MCP Server](#video-13-custom-mcp-server) | FastMCP, Netmiko, SSH | 🔜 Coming Soon |
+| 14 | [Ansible + MCP Integration](#video-14-ansible--mcp-integration) | Ansible, MCP, Playbooks | 🔜 Coming Soon |
+| 15 | [pyATS + MCP Integration](#video-15-pyats--mcp-integration) | pyATS, MCP, Testing | 🔜 Coming Soon |
 
 ---
 
@@ -3018,6 +3021,30 @@ uv run netbox-mcp-server 2>&1 | tee mcp-debug.log
 
 ---
 
+## Video 13: Custom MCP Server
+
+🔜 **Coming Soon**
+
+Build your own MCP server from scratch using FastMCP and Netmiko to SSH into network devices and run commands via natural language.
+
+---
+
+## Video 14: Ansible + MCP Integration
+
+🔜 **Coming Soon**
+
+Integrate Ansible with MCP to run playbooks and automate network tasks using natural language commands.
+
+---
+
+## Video 15: pyATS + MCP Integration
+
+🔜 **Coming Soon**
+
+Connect pyATS testing framework with MCP for AI-powered network testing and validation.
+
+---
+
 ## 📚 Additional Resources
 
 | Resource | Link |
@@ -3060,6 +3087,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - ✅ Updated NetBox URL to 192.168.1.20
 - ✅ Added Key Concepts table (Pontification, DCIM, IPAM)
 - ✅ Added Important Notes box (Read-only, No SSH)
+- ✅ Added Video 13: Custom MCP Server (Coming Soon)
+- ✅ Added Video 14: Ansible + MCP Integration (Coming Soon)
+- ✅ Added Video 15: pyATS + MCP Integration (Coming Soon)
 
 ### v12.0 (2025-01-21)
 - ✅ Added comprehensive OAuth client secret error troubleshooting to Video 9

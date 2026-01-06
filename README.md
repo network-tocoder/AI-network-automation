@@ -3001,6 +3001,18 @@ Build a custom MCP server using FastMCP and Netmiko to SSH into network devices 
 - **Python 3.11+** - Runtime
 - **UV** - Package management
 
+---
+
+## Prerequisites (From Video 12)
+
+Viewers should already have:
+- ✅ Claude Code installed
+- ✅ UV installed
+- ✅ Basic understanding of MCP (Video 11 & 12)
+- ✅ Network devices they can SSH into (EVE-NG lab)
+
+---
+
 ### 📦 Key Components
 
 <details>

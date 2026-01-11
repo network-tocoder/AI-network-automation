@@ -41,12 +41,12 @@ This series takes you from zero to hero in network automation. Build a complete 
 | 5 | [FortiGate Ansible](#video-5-fortigate-firewall-using-ansible) | Ansible, FortiGate, Vault | [▶️ YouTube](https://www.youtube.com/watch?v=3VL-JRIJT8M) |
 | 6 | [FortiGate REST API](#video-6-fortigate-automation-using-rest-api) | REST API, Postman | [▶️ YouTube](https://www.youtube.com/watch?v=Eqy4q9SsmtE) |
 | 7 | [NetBox Docker](#video-7-netbox-installation-using-docker) | NetBox, Docker | [▶️ YouTube](https://www.youtube.com/watch?v=OGQGly7NIFY) |
-| 8 | [NetBox Dynamic Inventory](#video-8-netbox-dynamic-inventory---core-concepts-explained) | DIODE, ORB, Architecture | [▶️ YouTube](https://www.youtube.com/watch?v=JZ-jDCT8mQY) |
+| 8 | [NetBox Dynamic Inventory](#video-8-netbox-dynamic-inventory---core-concepts-explained) | DIODE, ORB, Architecture | [▶️ YouTube](https://www.youtube.com/watch?v=nD9FeG8A44o) |
 | 9 | [NetBox Auto-Discovery](#video-9-netbox-auto-discovery---complete-setup-guide) | DIODE, ORB Agent, OAuth | [▶️ YouTube](https://www.youtube.com/watch?v=DODzEsMTmKQ) |
 | 10 | [pyATS + NetBox](#video-10-pyats--netbox-integration) | pyATS, Testing, NetBox | [▶️ YouTube](https://www.youtube.com/watch?v=V_PmWxC2QDA) |
 | 11 | [MCP Fundamentals](#video-11-mcp-fundamentals---connect-ai-to-network-tools) | MCP Core Concepts, Architecture | [▶️ YouTube](https://www.youtube.com/watch?v=YOUR_VIDEO_ID) |
 | 12 | [NetBox + MCP Hands-On](#video-12-netbox--mcp-hands-on-setup) | Claude CLI, NetBox MCP | [▶️ YouTube](https://www.youtube.com/watch?v=1CImPJ6g0ns) |
-| 13 | [Custom Device MCP](#video-13-custom-mcp-server---network-device-automation) | Netmiko, SSH, FastMCP | 🔜 Coming Soon |
+| 13 | [Custom Device MCP](#video-13-custom-mcp-server---network-device-automation) | Netmiko, SSH, FastMCP | 🔜 Coming Soon | [▶️ YouTube](https://www.youtube.com/watch?v=vtDuhAP-KfQ) |
 | 14 | [Ansible Dynamic Inventory](#video-14-ansible-dynamic-inventory-with-netbox) | Ansible, NetBox Plugin | 🔜 Coming Soon |
 | 15 | [Ansible MCP Integration](#video-15-ansible-mcp-integration) | Ansible + Claude | 🔜 Coming Soon |
 | 16 | [pyATS MCP Server](#video-16-pyats-mcp-server) | pyATS + Claude | 🔜 Coming Soon |

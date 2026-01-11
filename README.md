@@ -337,6 +337,38 @@ Configure Ansible to pull device inventory directly from NetBox instead of stati
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
+### 🔄 How Dynamic Inventory Works
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                 │
+│   You run:                                                                      │
+│   $ ansible-inventory --graph                                                   │
+│                    │                                                            │
+│                    ▼                                                            │
+│   Ansible reads: inventory/netbox.yml                                           │
+│                    │                                                            │
+│                    ▼                                                            │
+│   Ansible calls: NetBox API automatically                                       │
+│   GET http://<netbox>/api/dcim/devices/                                         │
+│                    │                                                            │
+│                    ▼                                                            │
+│   NetBox returns: Device list (JSON)                                            │
+│                    │                                                            │
+│                    ▼                                                            │
+│   Ansible shows: Inventory graph                                                │
+│                                                                                 │
+│   @all:                                                                         │
+│     |--@device_roles_router:                                                    │
+│     |  |--vIOS-R1                                                               │
+│     |  |--vIOS-R2                                                               │
+│     |  |--vIOS-R3                                                               │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Key Concept:** The `netbox.yml` file is NOT the inventory itself - it's the CONFIG that tells Ansible HOW to get inventory from NetBox. Every time you run an Ansible command, it queries NetBox in real-time!
+
 ### 📋 Prerequisites
 
 | Requirement | Details |

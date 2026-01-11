@@ -1,5 +1,32 @@
-# README v15.0 UPDATE
-## Complete replacement sections for Videos 13-16
+  <a href="https://git.io/typing-svg">
+    <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=45&pause=1000&color=00E5FF&center=true&vCenter=true&width=1500&lines=Network+Automation+Series;Building+Intent-Based+Networks;AI-Powered+Networking+with+MCP" alt="Network Automation Series" />
+  </a>
+</p>
+
+<p align="center">
+  <img src="assets/Series Thumpnail.jpg" alt="Network Coder Banner" width="800">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Network-007ACC?style=for-the-badge" alt="Network">
+  <img src="https://img.shields.io/badge/AI-8A2BE2?style=for-the-badge" alt="AI">
+  <img src="https://img.shields.io/badge/AI_Agents-141414?style=for-the-badge&logo=openai&logoColor=00F5FF" alt="AI Agents">
+  <img src="https://img.shields.io/badge/MCP-FF8C00?style=for-the-badge" alt="MCP">
+  <img src="https://img.shields.io/badge/Automation-D1242F?style=for-the-badge" alt="Automation">
+  <img src="https://img.shields.io/badge/Virtual_LAB-228B22?style=for-the-badge" alt="Virtual Lab">
+</p>
+
+<p align="center">
+  <a href="https://youtube.com/@NetworkCoder"><img src="https://img.shields.io/badge/Tutorials-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="YouTube"></a>
+  <a href="https://www.linkedin.com/in/hadeek"><img src="https://img.shields.io/badge/Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
+  <a href="https://github.com/network-tocoder"><img src="https://img.shields.io/badge/Projects-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+</p>
+
+---
+
+## 🎓 What You'll Learn
+
+This series takes you from zero to hero in network automation. Build a complete virtual lab in EVE-NG, automate firewalls, deploy NetBox for infrastructure management, and integrate everything with modern DevOps tools and AI.
 
 ---
 

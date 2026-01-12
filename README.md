@@ -3508,8 +3508,18 @@ query_filters:
 compose:
   # Extract IP without subnet mask (192.168.1.101/24 -> 192.168.1.101)
   ansible_host: primary_ip4.address | split('/') | first
-  # Use platform slug for network_os
-  ansible_network_os: platform.slug
+  # Use platform slug for network_os ( Jinja modify the os details based platfrom info from Netbox, all automatic)
+  ansible_network_os: >
+    {% set slug = platform.slug %}
+    {% if 'ios' in slug %}
+      cisco.ios.ios
+    {% elif 'forti' in slug or 'fortigate' in slug %}
+      fortinet.fortios.fortios
+    {% elif 'nxos' in slug %}
+      cisco.nxos.nxos
+    {% else %}
+      {{ slug | replace('-', '.') }}
+    {% endif %}
 
 # Only include devices that have a primary IP assigned
 device_query_filters:

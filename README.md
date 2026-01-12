@@ -3559,33 +3559,9 @@ timeout = 30
 
 </details>
 
-<details>
-<summary>6. Create Group Variables</summary>
-
-```bash
-# Create group_vars directory if it doesn't exist
-mkdir -p group_vars
-
-# Create common variables for all devices
-code ./group_vars/all.yml
-```
-
-**group_vars/all.yml:**
-```yaml
----
-# Connection settings for all devices
-ansible_user: ansible
-ansible_password: ansible@123
-ansible_connection: network_cli
-# ansible_network_os: cisco.ios.ios ( add it if nessary .. it can pulled from netbox with Jinaj2 template used in netbox.yml file)
-ansible_become: yes
-ansible_become_method: enable
-```
-
-</details>
 
 <details>
-<summary>7. Test Dynamic Inventory</summary>
+<summary>6. Test Dynamic Inventory</summary>
 
 ```bash
 # View inventory as a tree graph
@@ -3619,7 +3595,7 @@ ansible-inventory -i inventory/netbox.yml --host vIOS-R1 --vars --yaml
 </details>
 
 <details>
-<summary>8. Run Playbook with Dynamic Inventory</summary>
+<summary>7. Run Playbook with Dynamic Inventory</summary>
 
 ```bash
 # Create test playbook
@@ -3659,7 +3635,7 @@ ansible-playbook playbooks/show_version.yml --limit vIOS-R1
 </details>
 
 <details>
-<summary>9. Demo: Add Device in NetBox -> Auto Appears in Ansible</summary>
+<summary>8. Demo: Add Device in NetBox -> Auto Appears in Ansible</summary>
 
 ```bash
 # THE MAGIC OF DYNAMIC INVENTORY:

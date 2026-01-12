@@ -3608,8 +3608,6 @@ ansible-inventory --list
 ansible-inventory --host vIOS-R1
 ansible-inventory -i inventory/netbox.yml --host vIOS-R1 --vars --yaml
 
-# Test connectivity to all devices
-ansible all -m ping
 ```
 
 </details>
@@ -3621,20 +3619,22 @@ ansible all -m ping
 # Create test playbook
 cat << 'EOF' > playbooks/show_version.yml
 ---
-- name: Show Version - Dynamic Inventory Test
+- name: IOS Version Report
   hosts: all
   gather_facts: no
+  vars:
+    ansible_user: ansible
+    ansible_ssh_password: ansible@123
 
   tasks:
-    - name: Run show version
-      cisco.ios.ios_command:
-        commands:
-          - show version
+    - name: Get version
+      raw: show version
+
       register: version
 
-    - name: Display output
+    - name: Show version
       debug:
-        msg: "{{ version.stdout_lines[0][:5] }}"
+        msg: "{{ inventory_hostname }}: {{ (version.stdout_lines | select('match', '.*IOS.*') | first) }}"
 EOF
 
 # Run on all devices

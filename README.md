@@ -3435,7 +3435,7 @@ ls -l
 cat ./inventory/hosts
 
 # Backup static inventory before changes
-cp ./inventory/hosts ./inventory/hosts.backup
+mv ./inventory/hosts ./inventory/hosts.backup
 
 # Verify backup created
 ls -l ./inventory/

@@ -3100,7 +3100,7 @@ Configure Ansible to pull device inventory directly from NetBox instead of stati
 
 **Key Concept:** The `netbox.yml` file is NOT the inventory itself - it's the CONFIG that tells Ansible HOW to get inventory from NetBox. Every time you run an Ansible command, it queries NetBox in real-time!
 
-### Dynamic Inventory Structure
+### 📋 Dynamic Inventory Structure
 
 This section contains the JSON schema used by our dynamic inventory scripts. Click the arrows below to expand each section.
 
@@ -3135,6 +3135,72 @@ Contains individual device details like **Serial Numbers**, **Manufacturer**, an
 }
 ```
 </details>
+
+#### 🏗️ 2. Group Definitions
+These groups allow you to target devices based on their function, location, or OS platform. Each group contains its own specific variables.
+
+<details>
+<summary>▶ Click to expand Group Definitions (Roles, Sites, Platforms)</summary>
+
+```json
+{
+  "role_spine": {
+    "hosts": ["spine-01.dc1"]
+  },
+  "role_leaf": {
+    "hosts": ["leaf-01.dc1"]
+  },
+  "site_chicago": {
+    "hosts": ["spine-01.dc1", "leaf-01.dc1"],
+    "vars": {
+      "ntp_server": "10.0.0.5",
+      "timezone": "CST",
+      "dns_primary": "8.8.8.8"
+    }
+  },
+  "platform_ios": {
+    "hosts": ["spine-01.dc1"],
+    "vars": {
+      "ansible_network_os": "cisco.ios.ios"
+    }
+  },
+  "platform_eos": {
+    "hosts": ["leaf-01.dc1"],
+    "vars": {
+      "ansible_network_os": "arista.eos.eos"
+    }
+  }
+}
+```
+</details>
+
+#### 🌍 3. Global Hierarchy (all)
+This is the "Parent" group. It lists all other groups as children and sets the global variables used for the entire fleet.
+
+<details> <summary>▶ Click to expand Global Hierarchy & Connection Vars</summary>
+
+```json
+{
+  "all": {
+    "children": [
+      "role_spine",
+      "role_leaf",
+      "site_chicago",
+      "platform_ios",
+      "platform_eos"
+    ],
+    "vars": {
+      "ansible_connection": "ansible.netcommon.network_cli",
+      "ansible_user": "netadmin",
+      "ansible_become": true,
+      "ansible_become_method": "enable"
+    }
+  }
+}
+```
+</details>
+
+
 
 ### 🏠 Home LAB Demo Setup
 

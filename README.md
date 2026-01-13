@@ -3133,61 +3133,8 @@ Contains individual device details like **Serial Numbers**, **Manufacturer**, an
     }
   }
 }
-
+```
 </details>
-
-# 🌐 Network Inventory: Groups & Hierarchy
-
-Below is the structured breakdown of the dynamic inventory groups and the global hierarchy.
-
----
-
-## 🏗️ Group Definitions
-Logical groupings designed to allow targeted playbooks based on device function, location, or operating system.
-
-<details>
-<summary><b>▶ Click to expand Group Structure (Roles, Sites, Platforms)</b></summary>
-
-```json
-{
-  "role_spine": {
-    "hosts": ["spine-01.dc1", "spine-02.dc1"],
-    "vars": {
-      "device_role": "backbone",
-      "routing_protocol": "bgp"
-    }
-  },
-  "role_leaf": {
-    "hosts": ["leaf-01.dc1", "leaf-02.dc1"],
-    "vars": {
-      "device_role": "access",
-      "vlan_range": "100-200"
-    }
-  },
-  "site_chicago": {
-    "hosts": ["spine-01.dc1", "spine-02.dc1", "leaf-01.dc1", "leaf-02.dc1"],
-    "vars": {
-      "site_name": "Chicago_DataCenter",
-      "ntp_server": "10.0.0.5",
-      "dns_server": "8.8.8.8",
-      "timezone": "CST"
-    }
-  },
-  "platform_ios": {
-    "hosts": ["spine-01.dc1", "spine-02.dc1"],
-    "vars": {
-      "ansible_network_os": "cisco.ios.ios",
-      "ansible_ssh_common_args": "-o KexAlgorithms=+diffie-hellman-group14-sha1"
-    }
-  },
-  "platform_eos": {
-    "hosts": ["leaf-01.dc1", "leaf-02.dc1"],
-    "vars": {
-      "ansible_network_os": "arista.eos.eos"
-    }
-  }
-}
-
 
 ### 🏠 Home LAB Demo Setup
 

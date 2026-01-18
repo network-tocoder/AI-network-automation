@@ -5,7 +5,7 @@
 
 <p align="center">
   <img src="assets/Series Thumpnail.jpg" alt="Network Coder Banner" width="800">
-</p>a
+</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Network-007ACC?style=for-the-badge" alt="Network">
@@ -4175,9 +4175,11 @@ NOTE: This is NOT multi-agent. It's ONE AI with MULTIPLE tools.
 
 ---
 
+
 ## 🖥️ PART 1: Server Setup (Ansible Node)
 
-### 💻 Step 1.1: Create Project Folder
+<details>
+<summary>💻 Step 1.1: Create Project Folder</summary>
 
 ```bash
 # On Ansible Node (192.168.1.119)
@@ -4190,7 +4192,10 @@ pwd
 # Expected: /home/user/mcp-servers/unified-mcp-sse
 ```
 
-### 💻 Step 1.2: Create Virtual Environment
+</details>
+
+<details>
+<summary>💻 Step 1.2: Create Virtual Environment</summary>
 
 ```bash
 # Create venv
@@ -4204,7 +4209,10 @@ which python
 # Expected: /home/user/mcp-servers/unified-mcp-sse/.venv/bin/python
 ```
 
-### 💻 Step 1.3: Install Dependencies
+</details>
+
+<details>
+<summary>💻 Step 1.3: Install Dependencies</summary>
 
 ```bash
 # Install required packages
@@ -4219,7 +4227,10 @@ pip show uvicorn | grep Version
 # Version: 0.x.x (uvicorn)
 ```
 
-### 💻 Step 1.4: Get NetBox API Token
+</details>
+
+<details>
+<summary>💻 Step 1.4: Get NetBox API Token</summary>
 
 ```bash
 # If you don't know your token, get it from NetBox UI:
@@ -4234,7 +4245,10 @@ curl -s http://192.168.1.120:8000/api/dcim/devices/ \
 # Should return JSON with device list
 ```
 
-### 💻 Step 1.5: Create Unified MCP Server
+</details>
+
+<details>
+<summary>💻 Step 1.5: Create Unified MCP Server</summary>
 
 ```bash
 # Create the server file
@@ -4374,7 +4388,10 @@ EOF
 chmod +x unified_mcp_sse.py
 ```
 
-### 💻 Step 1.6: Update Configuration
+</details>
+
+<details>
+<summary>💻 Step 1.6: Update Configuration</summary>
 
 ```bash
 # Edit the file to add your NetBox token
@@ -4386,7 +4403,10 @@ NETBOX_TOKEN = "YOUR-NETBOX-TOKEN-HERE"  # ← Put your actual token
 # Save: Ctrl+O, Enter, Ctrl+X
 ```
 
-### 💻 Step 1.7: Start MCP Server
+</details>
+
+<details>
+<summary>💻 Step 1.7: Start MCP Server</summary>
 
 ```bash
 # Start the server
@@ -4406,7 +4426,10 @@ python unified_mcp_sse.py
 # INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
 ```
 
-### 💻 Step 1.8: Verify Port is Listening (New Terminal)
+</details>
+
+<details>
+<summary>💻 Step 1.8: Verify Port is Listening (New Terminal)</summary>
 
 ```bash
 # Open new terminal, check port
@@ -4416,7 +4439,10 @@ ss -tlnp | grep 8080
 # LISTEN 0 2048 0.0.0.0:8080 0.0.0.0:* users:(("python",pid=xxxx,fd=6))
 ```
 
-### 💻 Step 1.9: Test SSE Endpoint Locally
+</details>
+
+<details>
+<summary>💻 Step 1.9: Test SSE Endpoint Locally</summary>
 
 ```bash
 # Test the SSE endpoint (will hang - that's normal for SSE)
@@ -4427,7 +4453,10 @@ curl http://localhost:8080/sse
 # If it hangs waiting - that's correct! SSE keeps connection open
 ```
 
-### 💻 Step 1.10: Check Firewall
+</details>
+
+<details>
+<summary>💻 Step 1.10: Check Firewall</summary>
 
 ```bash
 # Allow port 8080 through firewall
@@ -4439,11 +4468,14 @@ sudo ufw status
 # If firewall inactive, that's fine - port is open
 ```
 
+</details>
+
 ---
 
 ## 💻 PART 2: Client Setup (Windows)
 
-### 💻 Step 2.1: Install Node.js (if not installed)
+<details>
+<summary>💻 Step 2.1: Install Node.js (if not installed)</summary>
 
 ```powershell
 # Check if Node.js is installed
@@ -4456,7 +4488,10 @@ node --version
 # 4. Restart PowerShell
 ```
 
-### 💻 Step 2.2: Install Gemini CLI
+</details>
+
+<details>
+<summary>💻 Step 2.2: Install Gemini CLI</summary>
 
 ```powershell
 # Install Gemini CLI globally
@@ -4468,7 +4503,10 @@ gemini --version
 # Expected: 0.24.x or higher
 ```
 
-### 💻 Step 2.3: Generate Google API Key (FREE)
+</details>
+
+<details>
+<summary>💻 Step 2.3: Generate Google API Key (FREE)</summary>
 
 ```
 1. Open browser: https://aistudio.google.com/apikey
@@ -4483,10 +4521,13 @@ gemini --version
 5. Keep this key safe - you'll need it next!
 ```
 
-### 💻 Step 2.4: Configure API Key (Permanent)
+</details>
+
+<details>
+<summary>💻 Step 2.4: Configure API Key (Permanent)</summary>
 
 ```powershell
-# Option A: Create PowerShell profile (if doesn't exist)
+# Create PowerShell profile (if doesn't exist)
 New-Item -Path $PROFILE -ItemType File -Force
 
 # Open profile in notepad
@@ -4500,7 +4541,10 @@ $env:GEMINI_API_KEY = "AIzaSy...your-key-here"
 # Restart PowerShell for changes to take effect
 ```
 
-### 💻 Step 2.5: Verify API Key is Set
+</details>
+
+<details>
+<summary>💻 Step 2.5: Verify API Key is Set</summary>
 
 ```powershell
 # After restarting PowerShell, verify:
@@ -4510,10 +4554,13 @@ echo $env:GEMINI_API_KEY
 # If empty - profile didn't load, try again
 ```
 
-### 💻 Step 2.6: Test Connectivity to Server
+</details>
+
+<details>
+<summary>💻 Step 2.6: Test Connectivity to Server</summary>
 
 ```powershell
-# Test if you can reach the MCP server
+# Test if you can reach the MCP server (use curl.exe, not PowerShell alias)
 curl.exe http://192.168.1.119:8080/sse
 
 # Expected: Connection stays open (SSE stream)
@@ -4523,13 +4570,28 @@ curl.exe http://192.168.1.119:8080/sse
 # If timeout - check firewall/network
 ```
 
-### 💻 Step 2.7: Configure Gemini MCP Settings
+</details>
+
+<details>
+<summary>💻 Step 2.7: Register MCP Server with Gemini CLI</summary>
+
+**Option A: Use Gemini CLI command**
 
 ```powershell
-# Open settings file in notepad
+# Add remote MCP server (single line - no backslashes in PowerShell)
+gemini mcp add network-automation --transport sse --url http://192.168.1.119:8080/sse --scope user
+
+# Verify
+gemini mcp list
+```
+
+**Option B: Manually edit settings file (if Option A doesn't save URL)**
+
+```powershell
+# Open settings file
 notepad $env:USERPROFILE\.gemini\settings.json
 
-# If file doesn't exist, create it with this content:
+# Add this content:
 ```
 
 ```json
@@ -4546,11 +4608,14 @@ notepad $env:USERPROFILE\.gemini\settings.json
 ```powershell
 # Save and close notepad
 
-# NOTE: The Gemini CLI 'mcp add' command has a bug that doesn't save the URL
-# That's why we manually edit the settings file
+# NOTE: Gemini CLI has a bug that sometimes doesn't save the URL
+# If 'gemini mcp list' shows empty URL, use Option B
 ```
 
-### 💻 Step 2.8: Verify MCP Connection
+</details>
+
+<details>
+<summary>💻 Step 2.8: Verify MCP Connection</summary>
 
 ```powershell
 # Check MCP server status
@@ -4566,21 +4631,27 @@ gemini mcp list
 # 3. Check firewall allows port 8080
 ```
 
+</details>
+
 ---
 
 ## 🧪 PART 3: Testing
 
-### 💻 Step 3.1: Start Gemini CLI
+<details>
+<summary>💻 Step 3.1: Start Gemini CLI</summary>
 
 ```powershell
 # Start Gemini
 gemini
 
 # You should see the Gemini banner and prompt
-# Look for "1 MCP server" message
+# Look for "1 MCP server" message at bottom
 ```
 
-### 💻 Step 3.2: Test Queries
+</details>
+
+<details>
+<summary>💻 Step 3.2: Test Queries</summary>
 
 ```
 # Query 1: List NetBox devices
@@ -4603,7 +4674,10 @@ gemini
 > Run backup_config playbook on vIOS-R1
 ```
 
-### 💻 Step 3.3: Check Token Usage
+</details>
+
+<details>
+<summary>💻 Step 3.3: Check Token Usage</summary>
 
 ```powershell
 # Exit Gemini CLI (Ctrl+C or type /exit)
@@ -4611,7 +4685,15 @@ gemini
 # Check usage at:
 # https://aistudio.google.com/apikey
 # Click on your key → View metrics
+
+# Understanding the metrics:
+# - Reqs: Number of API requests
+# - Input Tokens: Your prompts sent to model
+# - Cache Reads: Reused tokens (saves quota)
+# - Output Tokens: Model responses
 ```
+
+</details>
 
 ---
 
@@ -4654,7 +4736,7 @@ python unified_mcp_sse.py
 <summary>❌ "Rate limit exceeded" or "429 TooManyRequests"</summary>
 
 ```
-This is per-minute rate limiting, not daily quota.
+This is per-minute rate limiting, NOT daily quota.
 
 Solution: Wait 1-2 minutes and try again.
 
@@ -4713,6 +4795,32 @@ cat $PROFILE
 
 </details>
 
+<details>
+<summary>❌ Gemini CLI not saving URL (mcp add bug)</summary>
+
+```powershell
+# Check what was saved
+cat $env:USERPROFILE\.gemini\settings.json
+
+# If URL is empty "", manually edit:
+notepad $env:USERPROFILE\.gemini\settings.json
+
+# Replace content with:
+{
+  "mcpServers": {
+    "network-automation": {
+      "url": "http://192.168.1.119:8080/sse",
+      "type": "sse"
+    }
+  }
+}
+
+# Save and verify
+gemini mcp list
+```
+
+</details>
+
 ### 🔐 Security Recommendations
 
 | Risk | Mitigation |
@@ -4753,12 +4861,6 @@ The next phase of our Network Automation journey - Enterprise-grade automation w
 | # | Video | Topic | Status |
 |---|-------|-------|--------|
 | 17 | [AWX Installation](#video-17-awx-installation-on-k3s) | K3s, Kubernetes, AWX | 🔜 Coming Soon |
-| 18 | [AWX Git Integration](#video-18-awx-git-integration) | GitHub/GitLab, Projects | 🔜 Coming Soon |
-| 19 | [AWX NetBox Inventory](#video-19-awx-netbox-inventory) | Dynamic Inventory | 🔜 Coming Soon |
-| 20 | [Execution Environments](#video-20-execution-environments) | Custom EE, Docker | 🔜 Coming Soon |
-| 21 | [AWX + Claude Code](#video-21-awx-claude-code-integration) | AI Agent, AWX API | 🔜 Coming Soon |
-| 22 | [AWX MCP Server](#video-22-awx-mcp-server) | Custom MCP, AWX | 🔜 Coming Soon |
-| 23 | [AWX + Gemini CLI](#video-23-awx-gemini-cli) | Free AI, Remote AWX | 🔜 Coming Soon |
 | 18 | [AWX Git Integration](#video-18-awx-git-integration) | GitHub/GitLab, Projects | 🔜 Coming Soon |
 | 19 | [AWX NetBox Inventory](#video-19-awx-netbox-inventory) | Dynamic Inventory | 🔜 Coming Soon |
 | 20 | [Execution Environments](#video-20-execution-environments) | Custom EE, Docker | 🔜 Coming Soon |
@@ -4841,14 +4943,15 @@ helm install awx-operator awx-operator/awx-operator -n awx
 
 ### v25.0 (2025-01-18)
 - ✅ Video 16: Complete rewrite with step-by-step instructions
+  - All steps now collapsible (details/summary)
   - Server setup: 10 detailed steps with verification
   - Client setup: 8 detailed steps with verification
   - Testing section with example queries
-  - Comprehensive troubleshooting guide
+  - Added `gemini mcp add` command + manual JSON fallback
+  - Comprehensive troubleshooting guide (7 issues)
   - Gemini models and token usage explanation
   - Rate limit vs daily quota explanation
   - HostFixMiddleware for remote SSE connections
-  - Manual settings.json configuration (Gemini CLI bug workaround)
 
 ### v24.0 (2025-01-17)
 - ✅ Video 16: Architecture diagrams and basic setup

@@ -4868,68 +4868,410 @@ The next phase of our Network Automation journey - Enterprise-grade automation w
 
 ### 📋 Overview
 
-Deploy Ansible AWX on lightweight K3s Kubernetes in your home lab.
+Deploy Ansible AWX on lightweight K3s Kubernetes inside your EVE-NG lab. Transform your Ansible CLI workflows into enterprise-grade automation with a web UI.
 
-### ❓ Why AWX?
+### ❓ Why AWX in 2025?
 
-| Feature | Ansible CLI | AWX |
-|---------|-------------|-----|
-| Interface | Terminal | ✅ Web UI |
-| Scheduling | Cron | ✅ Built-in |
-| RBAC | None | ✅ Role-based |
-| Audit | Manual | ✅ Job history |
-| Credentials | Files | ✅ Secure store |
+| Challenge | Ansible CLI | AWX Solution |
+|-----------|-------------|--------------|
+| Who ran what? | Check bash history | ✅ Complete audit trail |
+| Team access | Share SSH keys | ✅ Role-based access (RBAC) |
+| Scheduling | Cron jobs | ✅ Built-in scheduler |
+| Credentials | Plain text files | ✅ Encrypted credential store |
+| Visibility | Terminal only | ✅ Web dashboard |
+| GitOps | Manual git pull | ✅ Auto-sync from repos |
 
-### 🏗️ Architecture (Preview)
+**Real-world value:** NOC teams can run playbooks without CLI access. Junior engineers get guardrails. Management gets visibility.
+
+### 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           EVE-NG SERVER                                      │
+│                         192.168.1.100                                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                    AWX NODE (Ubuntu Linux)                            │   │
+│   │                      192.168.1.121                                   │   │
+│   │                                                                      │   │
+│   │   ┌─────────────────────────────────────────────────────────────┐   │   │
+│   │   │                 K3s Kubernetes Cluster                       │   │   │
+│   │   │                                                              │   │   │
+│   │   │  ┌───────────┐  ┌───────────┐  ┌───────────┐               │   │   │
+│   │   │  │  AWX Web  │  │ AWX Task  │  │  AWX EE   │               │   │   │
+│   │   │  │  (nginx)  │  │ (celery)  │  │(container)│               │   │   │
+│   │   │  │ Port 30052 │  │           │  │           │               │   │   │
+│   │   │  └───────────┘  └───────────┘  └───────────┘               │   │   │
+│   │   │                                                              │   │   │
+│   │   │  ┌───────────┐  ┌───────────┐                               │   │   │
+│   │   │  │PostgreSQL │  │   Redis   │                               │   │   │
+│   │   │  │    DB     │  │   Cache   │                               │   │   │
+│   │   │  └───────────┘  └───────────┘                               │   │   │
+│   │   │                                                              │   │   │
+│   │   └─────────────────────────────────────────────────────────────┘   │   │
+│   │                                                                      │   │
+│   │   Requirements: 4 vCPU | 8GB RAM | 50GB Disk                        │   │
+│   └─────────────────────────────────────────────────────────────────────┘   │
+│                                           │                                  │
+│                                           │ SSH/API                          │
+│                                           ▼                                  │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                      Network Devices                                 │   │
+│   │              vIOS-R1 (.201)  vIOS-R2 (.202)  vIOS-R3 (.203)         │   │
+│   └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 📦 What Gets Installed
+
+| Component | Purpose |
+|-----------|---------|
+| K3s | Lightweight Kubernetes (single binary, ~512MB RAM) |
+| AWX Operator | Manages AWX lifecycle in Kubernetes |
+| AWX | Web UI, API, task engine, database |
+| Helm | Kubernetes package manager |
+
+### 💻 Commands
+
+<details>
+<summary>1. Prepare Ubuntu Linux Node in EVE-NG</summary>
+
+```bash
+# Clone from your golden image (Video 2) or create new node
+# specs: 2 vCPU, 4GB RAM
+
+# Set hostname
+sudo hostnamectl set-hostname awx-server
+
+# Verify resources
+free -h          # Should show 8GB+ RAM
+nproc            # Should show 4+ CPUs
+df -h            # Should show 50GB+ disk
+
+# Update system
+sudo dnf update -y
+
+# Disable firewall (lab only - enable in production)
+sudo systemctl disable firewalld --now
+
+# Disable SELinux (lab only)
+sudo setenforce 0
+sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
+
+# Get IP address
+ip addr show eth0 | grep inet
+# Note: 192.168.1.121 (example)
+```
+
+</details>
+
+<details>
+<summary>2. Install K3s (Lightweight Kubernetes)</summary>
+
+```bash
+# Install K3s - single command!
+curl -sfL https://get.k3s.io | sh -
+
+# If that doesn't work - Download the install script manually
+wget -O k3s-install.sh https://get.k3s.io
+
+# Make executable
+chmod +x k3s-install.sh
+
+# Run with INSTALL_K3S_SKIP_DOWNLOAD first to see if script works
+sudo ./k3s-install.sh
+
+# Wait for K3s to start (30-60 seconds)
+sleep 60
+
+# Verify K3s is running
+sudo systemctl status k3s
+
+# Check node is ready
+sudo kubectl get nodes
+# Expected: awx-server   Ready    control-plane,master   1m   v1.28.x
+
+# Setup kubectl for regular user (optional but recommended)
+mkdir -p ~/.kube
+sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+sudo chown $(id -u):$(id -g) ~/.kube/config
+
+# Add KUBECONFIG to your profile so it persists
+echo 'export KUBECONFIG=~/.kube/config' >> ~/.bashrc
+
+# Reload
+source ~/.bashrc
+
+# Verify kubectl works without sudo
+kubectl get nodes
+kubectl get pods -A
+```
+
+</details>
+
+<details>
+<summary>3. Install Helm Package Manager</summary>
+
+```bash
+# Download and install Helm
+curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+# Verify Helm installation
+helm version
+
+# Add AWX Operator Helm repository
+helm repo add awx-operator https://ansible-community.github.io/awx-operator-helm/
+helm repo update
+
+# Verify repo added
+helm search repo awx-operator
+```
+
+</details>
+
+<details>
+<summary>4. Create AWX Namespace</summary>
+
+```bash
+# Create dedicated namespace for AWX
+kubectl create namespace awx
+
+# Verify namespace
+kubectl get namespaces | grep awx
+```
+
+</details>
+
+<details>
+<summary>5. Install AWX Operator</summary>
+  
+```bash
+# Install AWX Operator via Helm (do NOT use --wait flag - it times out)
+helm install awx-operator awx-operator/awx-operator -n awx
+
+# Watch operator pod come up
+kubectl get pods -n awx -w
+```
+
+**If pod shows `ImagePullBackOff` or `ErrImagePull`:**
+
+```bash
+# Manually pull the image
+sudo k3s crictl pull quay.io/ansible/awx-operator:2.19.1
+
+# Delete stuck pod - K8s will recreate it
+kubectl delete pod -n awx -l control-plane=controller-manager
+
+# Watch again
+kubectl get pods -n awx -w
+```
+
+**Wait until you see:**
+```
+awx-operator-controller-manager-xxxxx   2/2   Running
+```
+
+Press `Ctrl+C` when Running.
+
+</details>
+
+<details>
+<summary>6. Create AWX Instance Custom Resource</summary>
+
+```bash
+# Create AWX instance definition
+cat <<EOF | kubectl apply -f -
+apiVersion: awx.ansible.com/v1beta1
+kind: AWX
+metadata:
+  name: awx
+  namespace: awx
+spec:
+  service_type: NodePort
+  nodeport_port: 30052
+EOF
+
+# Verify CR created
+kubectl get awx -n awx
+```
+
+</details>
+
+<details>
+<summary>7. Wait for AWX Deployment (5-10 minutes)</summary>
+
+```bash
+# Watch all pods come up - this takes 5-10 minutes!
+kubectl get pods -n awx -w
+
+# Expected final state (all Running):
+# awx-operator-controller-manager-xxxxx   2/2     Running
+# awx-postgres-15-0                        1/1     Running
+# awx-web-xxxxx                            3/3     Running
+# awx-task-xxxxx                           4/4     Running
+
+# Check deployment progress
+kubectl logs -f deployment/awx-operator-controller-manager -n awx -c awx-manager
+
+# Quick status check
+kubectl get pods -n awx
+kubectl get svc -n awx
+```
+
+</details>
+
+<details>
+<summary>8. Get AWX Admin Password</summary>
+
+```bash
+# Admin password is stored in a Kubernetes secret
+kubectl get secret awx-admin-password -n awx -o jsonpath='{.data.password}' | base64 --decode
+# Example output: kT9xPqL2mNvR5wYz
+
+# Save this password! You'll need it to login
+# Username: admin
+# Password: <output from above command>
+```
+
+</details>
+
+<details>
+<summary>9. Access AWX Web UI</summary>
+
+```bash
+# Get NodePort service details
+kubectl get svc -n awx
+# Look for: awx-service  NodePort  ...  80:30052/TCP
+
+# AWX URL
+echo "AWX URL: http://$(hostname -I | awk '{print $1}'):30052"
+# Example: http://192.168.1.129:30052
+
+# Open in browser:
+# URL: http://192.168.1.121:30052
+# Username: admin
+# Password: <from step 8>
+```
+
+</details>
+
+<details>
+<summary>10. Quick AWX UI Tour</summary>
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    K3s Kubernetes Cluster                        │
+│                        AWX DASHBOARD                             │
+├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐          │
-│   │   AWX Web   │   │  AWX Task   │   │  AWX EE     │          │
-│   │   (Pod)     │   │   (Pod)     │   │   (Pod)     │          │
-│   └─────────────┘   └─────────────┘   └─────────────┘          │
+│  📊 Dashboard        - Job status, recent activity              │
 │                                                                  │
-│   ┌─────────────┐   ┌─────────────┐                            │
-│   │ PostgreSQL  │   │    Redis    │                            │
-│   └─────────────┘   └─────────────┘                            │
+│  📁 Resources                                                    │
+│     ├── Templates    - Job templates (playbook + inventory)     │
+│     ├── Credentials  - SSH keys, API tokens, vault passwords    │
+│     ├── Projects     - Git repos with playbooks                 │
+│     ├── Inventories  - Static or dynamic (NetBox!)              │
+│     └── Hosts        - Managed devices                          │
+│                                                                  │
+│  ⚙️ Administration                                               │
+│     ├── Execution Environments  - Container images for jobs     │
+│     ├── Instance Groups         - Where jobs run                │
+│     └── Users/Teams             - RBAC configuration            │
+│                                                                  │
+│  📋 Jobs             - Running and completed jobs               │
+│                                                                  │
 └─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-                      Network Devices
 ```
 
-### 💻 Commands (Preview)
+</details>
+
+### ✅ Verification Checklist
+
+| Step | Verification Command | Expected Result |
+|------|---------------------|-----------------|
+| K3s installed | `kubectl get nodes` | Node shows "Ready" |
+| Helm installed | `helm version` | Version displayed |
+| Operator running | `kubectl get pods -n awx` | Operator pod "Running" |
+| AWX deployed | `kubectl get pods -n awx` | All pods "Running" |
+| UI accessible | Browser: `http://IP:30052` | Login page appears |
+| Login works | Enter admin credentials | Dashboard loads |
+
+### 🔧 Troubleshooting
+
+<details>
+<summary>❌ K3s fails to start</summary>
 
 ```bash
-# Install K3s
+# Check K3s logs
+sudo journalctl -u k3s -f
+
+# Common fix: Reset and reinstall
+sudo /usr/local/bin/k3s-uninstall.sh
 curl -sfL https://get.k3s.io | sh -
-
-# Install AWX Operator
-helm install awx-operator awx-operator/awx-operator -n awx
-
-# Access UI
-# http://192.168.1.121:8052
 ```
 
+</details>
+
+<details>
+<summary>❌ Pods stuck in Pending/ContainerCreating</summary>
+
+```bash
+# Check pod events
+kubectl describe pod <pod-name> -n awx
+
+# Check node resources
+kubectl describe node | grep -A 5 "Allocated resources"
+
+# Common issue: Not enough memory
+free -h
+# Solution: Increase VM RAM to 8GB+
+```
+
+</details>
+
+<details>
+<summary>❌ Cannot access UI on port 30052</summary>
+
+```bash
+# Verify service is running
+kubectl get svc -n awx
+
+# Check if port is listening
+ss -tlnp | grep 30052
+
+# Test locally first
+curl -I http://localhost:30052
+
+# Check firewall (if enabled)
+sudo firewall-cmd --add-port=30052/tcp --permanent
+sudo firewall-cmd --reload
+```
+
+</details>
+
+<details>
+<summary>❌ Forgot admin password</summary>
+
+```bash
+# Password is in Kubernetes secret
+kubectl get secret awx-admin-password -n awx -o jsonpath='{.data.password}' | base64 --decode
+
+# Or reset password via container
+kubectl exec -it deployment/awx-task -n awx -- awx-manage changepassword admin
+```
+
+</details>
+
+### 🔗 Resources
+
+- [AWX GitHub Repository](https://github.com/ansible/awx)
+- [AWX Operator Documentation](https://ansible.readthedocs.io/projects/awx-operator/)
+- [K3s Documentation](https://docs.k3s.io/)
+
 ---
 
-## 📚 Additional Resources
 
-| Resource | Link |
-|----------|------|
-| EVE-NG | [eve-ng.net](https://www.eve-ng.net/) |
-| NetBox | [netbox.dev](https://netbox.dev/) |
-| Ansible | [docs.ansible.com](https://docs.ansible.com/) |
-| AWX | [github.com/ansible/awx](https://github.com/ansible/awx) |
-| K3s | [k3s.io](https://k3s.io/) |
-| MCP Protocol | [modelcontextprotocol.io](https://modelcontextprotocol.io/) |
-| FastMCP | [github.com/jlowin/fastmcp](https://github.com/jlowin/fastmcp) |
-| Gemini CLI | [github.com/google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli) |
-| Google AI Studio | [aistudio.google.com](https://aistudio.google.com/) |
-
----
 
 ## 📝 Changelog
 
